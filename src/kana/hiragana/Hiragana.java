@@ -1,5 +1,7 @@
 package kana.hiragana;
 
+import java.util.*;
+
 /**
  * @author edotee
  */
@@ -14,7 +16,7 @@ public enum Hiragana {
     E('え', 'e'),
     O('お', 'o'),
 
-    // k, s, t, n, h, m, y, r, w
+    // k s t n h m y r w
     KA('か', 'k', 'a'),
     KI('き', 'k', 'i'),
     KU('く', 'k', 'u'),
@@ -77,7 +79,6 @@ public enum Hiragana {
     GO('ご', 'g', KO, Dakuten.TENTEN),
 
     //s-row
-    //
     ZA('ざ', 'z', SA, Dakuten.TENTEN),
     JI('じ', 'z', SHI, Dakuten.TENTEN, "ji"), ZI(JI.kana, JI.consonant, JI.vowel, JI.getRomanji()),
     ZU('ず', 'z', SU, Dakuten.TENTEN),
@@ -102,11 +103,10 @@ public enum Hiragana {
     PI('ぴ', 'p', HI, Dakuten.MARU),
     PU('ぷ', 'p', HU, Dakuten.MARU),
     PE('ぺ', 'p', HE, Dakuten.MARU),
-    PO('ぽ', 'p', HO, Dakuten.MARU),
-
+    PO('ぽ', 'p', HO, Dakuten.MARU)
     ;
 
-    enum Combo {
+    public enum Yoon {
 
         //KI
         KYA(KI, YA),
@@ -146,13 +146,13 @@ public enum Hiragana {
         GYU(GI, YU),
         GYO(GI, YO),
         //JI
-        JYA(JI, YA),
-        JYU(JI, YU),
-        JYO(JI, YO),
+        JYA(JI, YA, "ja"),      //according to wikipedia
+        JYU(JI, YU, "ju"),      //according to wikipedia
+        JYO(JI, YO, "jo"),      //according to wikipedia
         //DZI
-        DZYA(DZI, YA),
-        DZYU(DZI, YU),
-        DZYO(DZI, YO),
+        DZYA(DZI, YA, "ja"),    //according to wikipedia
+        DZYU(DZI, YU, "ju"),    //according to wikipedia
+        DZYO(DZI, YO, "jo"),    //according to wikipedia
         //BI
         BYA(BI, YA),
         BYU(BI, YU),
@@ -164,27 +164,42 @@ public enum Hiragana {
 
         ;
 
-        Hiragana leading, following;
-        ComboRomanji alternateReading;
+        final Hiragana leading, following;
+        final String alternateReading;
 
-        Combo(Hiragana leading, Hiragana following) {
+        Yoon(Hiragana leading, Hiragana following) {
             this(leading, following, null);
         }
 
-        Combo(Hiragana leading, Hiragana following, String alternateReading) {
+        Yoon(Hiragana leading, Hiragana following, String alternateReading) {
             this.leading = leading;
             this.following = following;
-            this.alternateReading = (alternateReading == null)? null : () -> alternateReading;
+            this.alternateReading = alternateReading;
+        }
+
+        public String getDigraph() {
+            return "" + leading.kana + following.kana;
         }
 
         public String getRomanji() {
             if(alternateReading != null)
-                return alternateReading.getRomanji();
+                return alternateReading;
             return "" + leading.consonant + following.getRomanji();
+        }
+
+        public static Yoon[] filter(Hiragana match) {
+            ArrayList<Yoon> wizardHat = new ArrayList<>();
+            for(Yoon y : Yoon.values())
+                if(y.leading == match || y.following == match)
+                    wizardHat.add(y);
+            Yoon[] result = new Yoon[wizardHat.size()];
+            for(int i = 0; i < result.length; i++)
+                result[i] = wizardHat.get(i);
+            return result;
         }
     }
 
-    enum Dakuten {
+    public enum Dakuten {
         TENTEN('゛', "tenten"),
         MARU('゜', "maru");
 
@@ -197,20 +212,10 @@ public enum Hiragana {
         }
     }
 
-    @FunctionalInterface
-    private interface AlternateRomanji {
-        String getRomanji();
-    }
-
-    @FunctionalInterface
-    private interface ComboRomanji {
-        String getRomanji();
-    }
-
-    private final static char NIL = '∅';
+    public final static char NIL = '∅';
 
     final char kana, consonant, vowel;
-    final AlternateRomanji alternateRomanji;
+    final String alternativeRomanji;
 
     Hiragana(char kana) {
         this(kana, 'n', NIL, null);
@@ -224,11 +229,11 @@ public enum Hiragana {
         this(kana, consonant, vowel, null);
     }
 
-    Hiragana(char kana, char consonant, char vowel, String alternateRomanji) {
+    Hiragana(char kana, char consonant, char vowel, String alternativeRomanji) {
         this.kana = kana;
         this.consonant = consonant;
         this.vowel = vowel;
-        this.alternateRomanji = (alternateRomanji == null)? null : () -> alternateRomanji;
+        this.alternativeRomanji = alternativeRomanji;
     }
 
     //Dakuten
@@ -236,12 +241,82 @@ public enum Hiragana {
         this(kana, consonant, hiragana.vowel, null);
     }
 
-    Hiragana(char kana, char consonant, Hiragana hiragana, Dakuten dakuten, String alternateRomanji) {
-        this(kana, consonant, hiragana.vowel, alternateRomanji);
+    Hiragana(char kana, char consonant, Hiragana hiragana, Dakuten dakuten, String alternativeRomanji) {
+        this(kana, consonant, hiragana.vowel, alternativeRomanji);
     }
 
-    //Methods
+    //Enum Methods
+    public static Hiragana[][] basicsByVowel() {
+        Hiragana[][] result = {
+                {A, KA, SA, TA, NA, HA, MA, YA, RA, WA},
+                {I, KI, SHI,CHI,NI, HI, MI, null, RI, null},
+                {U, KU, SU, TSU,NU, HU, MU, YU, RU, null},
+                {E, KE, SE, TE, NE, HE, ME, null, RE, null},
+                {O, KO, SO, TO, NO, HO, MO, YO, RO, WO}
+        };
+        return result;
+    }
 
+    public static Hiragana[][] basicsByConsonant() {
+        Hiragana[][] result = {
+                {A, I, U, E, O},
+                {KA, KI, KU, KE, KO},
+                {SA, SHI, SU, SE, SO},
+                {TA, CHI, TSU, TE, TO},
+                {NA, NI, NU, NE, NO},
+                {HA, HI, HU, HE, HO},
+                {MA, MI, MU, ME, MO},
+                {YA, null, YU, null, YO},
+                {RA, RI, RU, RE, RO},
+                {WA, null, null, null, WO}
+        };
+        return result;
+    }
+
+    public static Hiragana[][] dakutenByVowel() {
+        Hiragana[][] result = {
+                // k s t n h m y r w
+                {GA, ZA, DA, BA, PA},
+                {GI, JI, DZI, BI, PI},
+                {GU, ZU, DZU, BU, PU},
+                {GE, ZE, DE, BE, PE},
+                {GO, ZO, DO, BO, PO}
+        };
+        return result;
+    }
+
+    public static Hiragana[][] dakutenByConsonant() {
+        Hiragana[][] result = {
+                // k s t n h m y r w
+                {GA, GI, GU, GE, GO},
+                {ZA, JI, ZU, ZE, ZO},
+                {DA, DZI, DZU, DE, DO},
+                {BA, BI, BU, BE, BO},
+                {PA, PI, PU, PE, PO},
+        };
+        return result;
+    }
+
+    private static Hiragana[] flatten(Hiragana[][] arrays) {
+        ArrayList<Hiragana> temp = new ArrayList<>();
+        for(Hiragana[] kana : arrays)
+            Collections.addAll(temp, kana);
+        while(temp.remove(null)) {/* lol */}
+        Hiragana[] pancake = new Hiragana[temp.size()];
+        for(int i = 0; i < pancake.length; i++)
+            pancake[i] = temp.get(i);
+        return pancake;
+    }
+
+    public static Hiragana[] basicValues() {
+        return flatten(basicsByConsonant());
+    }
+
+    public static Hiragana[] dakutenValues() {
+        return flatten(dakutenByConsonant());
+    }
+
+    //Instance Methods
     public final char getKana() {
         return kana;
     }
@@ -255,12 +330,16 @@ public enum Hiragana {
     }
 
     public String getRomanji() {
-        if(alternateRomanji != null)
-            return alternateRomanji.getRomanji();
+        if(alternativeRomanji != null)
+            return alternativeRomanji;
 
         String result = "";
         if(consonant != NIL) result += consonant;
-        if(vowel != NIL) result += consonant;
+        if(vowel != NIL) result += vowel;
         return result;
+    }
+
+    public boolean hasIrregularReading() {
+        return alternativeRomanji != null;
     }
 }
