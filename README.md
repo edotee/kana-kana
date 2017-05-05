@@ -1,2 +1,2 @@
 # kana-kana
-GUI utility testing your katakana &amp; hiragana proficiency
+GUI utility testing your kana.katakana &amp; kana.katakana.hiragana proficiency
