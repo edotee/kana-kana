@@ -11,7 +11,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
-import kana.hiragana.Hiragana;
+import kana.Kana;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,7 +20,7 @@ import java.util.Random;
 /**
  * @author edotee
  */
-public class PickTheRightKana extends KanaExercise {
+public class PickTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
 
     private BorderPane layout;
     private Label question, inQuestion;
@@ -31,19 +31,19 @@ public class PickTheRightKana extends KanaExercise {
 
     private Random rng;
     private int rightAnswer;
-    private Hiragana[] answerChoices;
+    private ArrayList<T> answerChoices;
 
     ////////////////////////////////////
     private static final int AMOUNT = 5;
 
-    public PickTheRightKana(HashSet<Hiragana> targetKana, EventHandler<ActionEvent> onRightAnswer, EventHandler<ActionEvent> onWrongAnswer, EventHandler<ActionEvent> onComplete) {
+    public PickTheRightKana(HashSet<T> targetKana, EventHandler<ActionEvent> onRightAnswer, EventHandler<ActionEvent> onWrongAnswer, EventHandler<ActionEvent> onComplete) {
         super(targetKana, onRightAnswer, onWrongAnswer, onComplete);
     }
 
     @Override
     protected Scene initGUI() {
         rng = new Random();
-        answerChoices = new Hiragana[AMOUNT];
+        answerChoices = new ArrayList<>();
 
         /* Question Area */
         question = new Label("Which Hiragana is…");
@@ -82,16 +82,16 @@ public class PickTheRightKana extends KanaExercise {
     public void nextProblem() {
         pickAnswers();
         rightAnswer = rng.nextInt(AMOUNT);
-        inQuestion.setText("" + answerChoices[rightAnswer].getRomanji());
+        inQuestion.setText("" + answerChoices.get(rightAnswer).getRomanji());
         for(int i = 0; i < AMOUNT; i++)
-            updateButton(buttonPool[i], answerChoices[i]);
+            updateButton(buttonPool[i], answerChoices.get(i));
     }
 
     //helper methods
 
-    private void updateButton(Button button, Hiragana myKana) {
+    private void updateButton(Button button, T myKana) {
         button.setText("" + myKana.getKana());
-        if(myKana == answerChoices[rightAnswer])
+        if(myKana == answerChoices.get(rightAnswer))
             button.setOnAction(getOnRightAnswer());
         else
             button.setOnAction(getOnWrongAnswer());
@@ -101,16 +101,12 @@ public class PickTheRightKana extends KanaExercise {
         if (getTargetKana().size() < AMOUNT)
             return;
         //turn into arrayList, so we can use random to fish out an option
-        ArrayList<Hiragana> listOfOptions = new ArrayList<>(getTargetKana());
-        HashSet<Hiragana> validater = new HashSet<>();
-        int i = 0;
-        Hiragana temp;
-        while(i < AMOUNT) {
-            temp = listOfOptions.get(rng.nextInt(listOfOptions.size()));
-            if(validater.add(temp)){
-                answerChoices[i] = temp;
-                i++;
-            }
+        ArrayList<T> listOfOptions = new ArrayList<>(getTargetKana());
+        HashSet<T> validater = new HashSet<>();
+        while(validater.size() < AMOUNT) {
+            validater.add(listOfOptions.get(rng.nextInt(listOfOptions.size())));
         }
+        answerChoices.clear();
+        answerChoices.addAll(validater);
     }
 }

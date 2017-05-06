@@ -14,7 +14,7 @@ import java.util.*;
  */
 public class KanaGui extends Application {
 
-    public final static String TITLE = "Kana Test";
+    private final static String TITLE = "Kana Test";
     public final static double WIDTH = 854.0f;
     public final static double HEIGHT = 480.0f;
 
@@ -33,7 +33,8 @@ public class KanaGui extends Application {
         //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
         ArrayList<KanaExercise> tempList = new ArrayList<>();
-        tempList.add( new PickTheRightKana(generateListOfPotentialAnswers(), e -> advanceToNextProblem(), null, e -> advanceToNextExercise()) );
+        KanaExercise<Hiragana> tempExercise = new PickTheRightKana<>(generateListOfPotentialAnswers(), e -> advanceToNextProblem(), null, e -> advanceToNextExercise());
+        tempList.add( tempExercise );
         //tempList.add( newExercise );
         exercises = tempList.iterator();
         advanceToNextExercise();

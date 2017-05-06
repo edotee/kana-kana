@@ -4,7 +4,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import kana.Kana;
-import kana.hiragana.Hiragana;
 
 import java.util.HashSet;
 
@@ -14,13 +13,13 @@ import java.util.HashSet;
  * TODO rework nextProblem() so it updates its own GUI
  * TODO maybe somehow turn this into a pseudo stream that automatically starts the next exercise in line
  */
-public abstract class KanaExercise {
+public abstract class KanaExercise<T extends Kana<T>> {
 
-    private final HashSet<Hiragana> targetKana;
+    private final HashSet<T> targetKana;
     private final EventHandler<ActionEvent> onRightAnswer, onWrongAnswer, onComplete;
     private Scene gui;
 
-    public KanaExercise(HashSet<Hiragana> targetKana, EventHandler<ActionEvent> onRightAnswer, EventHandler<ActionEvent> onWrongAnswer, EventHandler<ActionEvent> onComplete) {
+    public KanaExercise(HashSet<T> targetKana, EventHandler<ActionEvent> onRightAnswer, EventHandler<ActionEvent> onWrongAnswer, EventHandler<ActionEvent> onComplete) {
         this.targetKana = targetKana;
         this.onRightAnswer = onRightAnswer;
         this.onWrongAnswer = onWrongAnswer;
@@ -38,7 +37,7 @@ public abstract class KanaExercise {
     /* Getter */
 
 
-    public HashSet<Hiragana> getTargetKana() {
+    public HashSet<T> getTargetKana() {
         return targetKana;
     }
 
