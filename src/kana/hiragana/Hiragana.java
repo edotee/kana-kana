@@ -1,5 +1,6 @@
 package kana.hiragana;
 
+import kana.Dakuten;
 import kana.Kana;
 
 import java.util.*;
@@ -8,7 +9,6 @@ import java.util.*;
  * @author edotee
  */
 public enum Hiragana implements Kana<Hiragana> {
-
     N('ん'),
 
     // a i u e o
@@ -211,7 +211,7 @@ public enum Hiragana implements Kana<Hiragana> {
     }
 
     //Instance Methods
-    public final char getKana() {
+    public char getKana() {
         return kana;
     }
 
@@ -226,5 +226,6 @@ public enum Hiragana implements Kana<Hiragana> {
     public boolean hasIrregularReading() {
         return alternativeRomanji != null;
     }
-    public  String getIrregularReading() { return alternativeRomanji; }
+
+    public String getIrregularReading() { return alternativeRomanji; }
 }

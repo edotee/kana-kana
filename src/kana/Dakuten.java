@@ -1,4 +1,4 @@
-package kana.hiragana;
+package kana;
 
 /**
  * @author edotee

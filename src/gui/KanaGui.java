@@ -20,7 +20,8 @@ public class KanaGui extends Application {
 
     private Stage mainWindow;
 
-    private KanaExercise exercise;
+    private Iterator<KanaExercise> exercises;
+    private KanaExercise currentExercise;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -31,7 +32,11 @@ public class KanaGui extends Application {
 
         //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-        exercise = new PickTheRightKana(generateListOfPotentialAnswers(), e -> advanceToNextProblem(), null, e -> advanceToNextExercise());
+        ArrayList<KanaExercise> tempList = new ArrayList<>();
+        tempList.add( new PickTheRightKana(generateListOfPotentialAnswers(), e -> advanceToNextProblem(), null, e -> advanceToNextExercise()) );
+        //tempList.add( newExercise );
+        exercises = tempList.iterator();
+        advanceToNextExercise();
 
         //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -42,20 +47,21 @@ public class KanaGui extends Application {
 
     private Scene initScene() {
         //TODO temporarely only
-        return exercise.getGUI();
+        return currentExercise.getGUI();
     }
 
     /**
      * TODO don't setScene()
      */
-    public void advanceToNextExercise() { mainWindow.setScene(exercise.getGUI());}
+    private void advanceToNextExercise() {
+        if(exercises.hasNext()) {
+            currentExercise = exercises.next();
+            mainWindow.setScene(currentExercise.getGUI());
+        } //else end
+    }
 
-
-    /**
-     * TODO don't setScene() - work it out so it only calls exercise.nextProblem()
-     */
-    public void advanceToNextProblem() {
-        exercise.nextProblem();
+    private void advanceToNextProblem() {
+        currentExercise.nextProblem();
     }
 
     private HashSet<Hiragana> generateListOfPotentialAnswers() {
