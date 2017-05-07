@@ -1,13 +1,16 @@
 package kana;
 
+import kana.KanaHelper.Consonant;
+import kana.KanaHelper.Vowel;
+import static kana.KanaHelper.Consonant.NOCON;
+import static kana.KanaHelper.Vowel.NOVOW;
 /**
  * @author edotee
  */
 public interface Kana<T extends Kana> {
-    char NIL = '∅'; // implicitly public final static
     char getKana();
-    char getConsonant();
-    char getVowel();
+    Consonant getConsonant();
+    Vowel getVowel();
     boolean hasIrregularReading();
     String getIrregularReading();
 
@@ -16,8 +19,8 @@ public interface Kana<T extends Kana> {
             return getIrregularReading();
 
         String result = "";
-        if(getConsonant() != NIL) result += getConsonant();
-        if(getVowel() != NIL) result += getVowel();
+        if(getConsonant() != NOCON) result += getConsonant();
+        if(getVowel() != NOVOW) result += getVowel();
         return result;
     }
 }

@@ -4,11 +4,11 @@ import gui.KanaGui;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import kana.Kana;
@@ -27,7 +27,6 @@ public class PickTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
     private VBox questionArea;
     private HBox answerArea;
     private Button[] buttonPool;
-    private Scene scene;
 
     private Random rng;
     private int rightAnswer;
@@ -36,17 +35,23 @@ public class PickTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
     ////////////////////////////////////
     private static final int AMOUNT = 5;
 
-    public PickTheRightKana(HashSet<T> targetKana, EventHandler<ActionEvent> onRightAnswer, EventHandler<ActionEvent> onWrongAnswer, EventHandler<ActionEvent> onComplete) {
-        super(targetKana, onRightAnswer, onWrongAnswer, onComplete);
+    private Button goToNextProblem, goToNextExercise;
+    private HBox buttonBox;
+
+    public PickTheRightKana(HashSet<T> targetKana,
+                            EventHandler<ActionEvent> onRightAnswer,
+                            EventHandler<ActionEvent> onWrongAnswer,
+                            EventHandler<ActionEvent> onSkip,
+                            EventHandler<ActionEvent> onComplete) {
+        super(targetKana, onRightAnswer, onWrongAnswer, onSkip, onComplete);
     }
 
-    @Override
-    protected Scene initGUI() {
+    @Override protected Region initGUI() {
         rng = new Random();
         answerChoices = new ArrayList<>();
 
         /* Question Area */
-        question = new Label("Which Hiragana is…");
+        question = new Label("Which Kana is…");
         question.setStyle("-fx-font: 36 arial;");
         question.setTextAlignment(TextAlignment.CENTER);
         inQuestion = new Label();
@@ -60,8 +65,6 @@ public class PickTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
         answerArea = new HBox();
         answerArea.setAlignment(Pos.CENTER);
         answerArea.setStyle("-fx-background-color: green; -fx-spacing: 10");
-
-        /* Buttons */
         buttonPool = new Button[AMOUNT];
         for(int i = 0; i < AMOUNT; i++) {
             buttonPool[i] = new Button();
@@ -69,17 +72,25 @@ public class PickTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
             answerArea.getChildren().add( buttonPool[i] );
         }
 
-        layout = new BorderPane();
-        layout.setPrefSize(KanaGui.WIDTH, KanaGui.HEIGHT);
+        /* Buttons */
+        goToNextProblem = new Button("Next Problem");
+        goToNextProblem.setOnAction(getOnSkip());
+        goToNextExercise = new Button("Next Exercise");
+        goToNextExercise.setOnAction(getOnComplete());
+        buttonBox = new HBox();
+        buttonBox.setStyle("-fx-spacing: 10");
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.getChildren().addAll(goToNextProblem, goToNextExercise);
+
+        layout = KanaGui.makeRegionSuitable(new BorderPane());
         layout.setTop(questionArea);
         layout.setCenter(answerArea);
+        layout.setBottom(buttonBox);
 
-        scene = new Scene(layout);
-
-        return scene;
+        return layout;
     }
 
-    public void nextProblem() {
+    @Override public void nextProblem() {
         pickAnswers();
         rightAnswer = rng.nextInt(AMOUNT);
         inQuestion.setText("" + answerChoices.get(rightAnswer).getRomanji());

@@ -2,27 +2,29 @@ package logic;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
+import javafx.scene.layout.Region;
 import kana.Kana;
 
 import java.util.HashSet;
 
 /**
  * @author edotee
- * TODO create implement getGUI() method that returns the (singleton) UI of the current exercise
- * TODO rework nextProblem() so it updates its own GUI
- * TODO maybe somehow turn this into a pseudo stream that automatically starts the next exercise in line
  */
 public abstract class KanaExercise<T extends Kana<T>> {
 
     private final HashSet<T> targetKana;
-    private final EventHandler<ActionEvent> onRightAnswer, onWrongAnswer, onComplete;
-    private Scene gui;
+    private final EventHandler<ActionEvent> onRightAnswer, onWrongAnswer, onSkip, onComplete;
+    private final Region gui;
 
-    public KanaExercise(HashSet<T> targetKana, EventHandler<ActionEvent> onRightAnswer, EventHandler<ActionEvent> onWrongAnswer, EventHandler<ActionEvent> onComplete) {
+    public KanaExercise(HashSet<T> targetKana,
+                        EventHandler<ActionEvent> onRightAnswer,
+                        EventHandler<ActionEvent> onWrongAnswer,
+                        EventHandler<ActionEvent> onSkip,
+                        EventHandler<ActionEvent> onComplete) {
         this.targetKana = targetKana;
         this.onRightAnswer = onRightAnswer;
         this.onWrongAnswer = onWrongAnswer;
+        this.onSkip = onSkip;
         this.onComplete = onComplete;
         this.gui = initGUI();
         nextProblem();
@@ -30,7 +32,7 @@ public abstract class KanaExercise<T extends Kana<T>> {
 
     /* Abstract Methods */
 
-    protected abstract Scene initGUI();
+    protected abstract Region initGUI();
 
     public abstract void nextProblem();
 
@@ -49,11 +51,15 @@ public abstract class KanaExercise<T extends Kana<T>> {
         return onWrongAnswer;
     }
 
+    public EventHandler<ActionEvent> getOnSkip() {
+        return onSkip;
+    }
+
     public EventHandler<ActionEvent> getOnComplete() {
         return onComplete;
     }
 
-    public Scene getGUI() {
+    public Region getGui() {
         return gui;
     }
 }
