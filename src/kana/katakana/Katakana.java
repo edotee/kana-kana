@@ -47,7 +47,7 @@ public enum Katakana implements Kana<Katakana> {
 
     HA('ハ', h, a),
     HI('ヒ', h, i),
-    HU('フ', h, u),
+    FU('フ', h, u, "fu"), HU(FU.kana, FU.consonant, FU.vowel, FU.getRomanji()),
     HE('ヘ', h, e),
     HO('ホ', h, o),
 
@@ -95,13 +95,13 @@ public enum Katakana implements Kana<Katakana> {
 
     BA('バ', b, HA, TENTEN),
     BI('ビ', b, HI, TENTEN),
-    BU('ブ', b, HU, TENTEN),
+    BU('ブ', b, FU, TENTEN),
     BE('ベ', b, HE, TENTEN),
     BO('ボ', b, HO, TENTEN),
 
     PA('パ', p, HA, MARU),
     PI('ピ', p, HI, MARU),
-    PU('プ', p, HU, MARU),
+    PU('プ', p, FU, MARU),
     PE('ペ', p, HE, MARU),
     PO('ポ', p, HO, MARU),
     ;

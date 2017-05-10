@@ -47,7 +47,7 @@ public enum Hiragana implements Kana<Hiragana> {
 
     HA('は', h, a),
     HI('ひ', h, i),
-    HU('ふ', h, u),
+    FU('フ', h, u, "fu"), HU(FU.kana, FU.consonant, FU.vowel, FU.getRomanji()),
     HE('へ', h, e),
     HO('ほ', h, o),
 
@@ -95,13 +95,13 @@ public enum Hiragana implements Kana<Hiragana> {
 
     BA('ば', b, HA, TENTEN),
     BI('び', b, HI, TENTEN),
-    BU('ぶ', b, HU, TENTEN),
+    BU('ぶ', b, FU, TENTEN),
     BE('べ', b, HE, TENTEN),
     BO('ぼ', b, HO, TENTEN),
 
     PA('ぱ', p, HA, MARU),
     PI('ぴ', p, HI, MARU),
-    PU('ぷ', p, HU, MARU),
+    PU('ぷ', p, FU, MARU),
     PE('ぺ', p, HE, MARU),
     PO('ぽ', p, HO, MARU),
     ;

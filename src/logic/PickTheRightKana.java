@@ -13,9 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import kana.Kana;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Random;
 
 /**
  * @author edotee
@@ -28,15 +26,7 @@ public class PickTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
     private HBox answerArea;
     private Button[] buttonPool;
 
-    private Random rng;
-    private int rightAnswer;
-    private ArrayList<T> answerChoices;
-
-    ////////////////////////////////////
-    private static final int AMOUNT = 5;
-
-    private Button goToNextProblem, goToNextExercise;
-    private HBox buttonBox;
+    private T rightAnswer;
 
     public PickTheRightKana(HashSet<T> targetKana,
                             EventHandler<ActionEvent> onRightAnswer,
@@ -46,10 +36,9 @@ public class PickTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
         super(targetKana, onRightAnswer, onWrongAnswer, onSkip, onComplete);
     }
 
-    @Override protected Region initGUI() {
-        rng = new Random();
-        answerChoices = new ArrayList<>();
+    @Override protected void initFields() { }
 
+    @Override protected Region initGUI() {
         /* Question Area */
         question = new Label("Which Kana is…");
         question.setStyle("-fx-font: 36 arial;");
@@ -65,59 +54,34 @@ public class PickTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
         answerArea = new HBox();
         answerArea.setAlignment(Pos.CENTER);
         answerArea.setStyle("-fx-background-color: green; -fx-spacing: 10");
-        buttonPool = new Button[AMOUNT];
-        for(int i = 0; i < AMOUNT; i++) {
+        buttonPool = new Button[getAmount()];
+        for(int i = 0; i < getAmount(); i++) {
             buttonPool[i] = new Button();
             buttonPool[i].setStyle("-fx-font: 36 arial; -fx-background-color: lightblue;");
             answerArea.getChildren().add( buttonPool[i] );
         }
 
-        /* Buttons */
-        goToNextProblem = new Button("Next Problem");
-        goToNextProblem.setOnAction(getOnSkip());
-        goToNextExercise = new Button("Next Exercise");
-        goToNextExercise.setOnAction(getOnComplete());
-        buttonBox = new HBox();
-        buttonBox.setStyle("-fx-spacing: 10");
-        buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.getChildren().addAll(goToNextProblem, goToNextExercise);
-
         layout = KanaGui.makeRegionSuitable(new BorderPane());
         layout.setTop(questionArea);
         layout.setCenter(answerArea);
-        layout.setBottom(buttonBox);
 
         return layout;
     }
 
-    @Override public void nextProblem() {
-        pickAnswers();
-        rightAnswer = rng.nextInt(AMOUNT);
-        inQuestion.setText("" + answerChoices.get(rightAnswer).getRomanji());
-        for(int i = 0; i < AMOUNT; i++)
-            updateButton(buttonPool[i], answerChoices.get(i));
+    @Override
+    protected void prepareFirstProblem() {
+        prepareNextProblem();
     }
 
-    //helper methods
-
-    private void updateButton(Button button, T myKana) {
-        button.setText("" + myKana.getKana());
-        if(myKana == answerChoices.get(rightAnswer))
-            button.setOnAction(getOnRightAnswer());
-        else
-            button.setOnAction(getOnWrongAnswer());
-    }
-
-    private void pickAnswers() {
-        if (getTargetKana().size() < AMOUNT)
-            return;
-        //turn into arrayList, so we can use random to fish out an option
-        ArrayList<T> listOfOptions = new ArrayList<>(getTargetKana());
-        HashSet<T> validater = new HashSet<>();
-        while(validater.size() < AMOUNT) {
-            validater.add(listOfOptions.get(rng.nextInt(listOfOptions.size())));
+    @Override protected void prepareNextProblem() {
+        rightAnswer = super.randomAnswer(rightAnswer);
+        inQuestion.setText("" + rightAnswer.getRomanji());
+        for(int myKana = 0; myKana < getAmount(); myKana++) {
+            buttonPool[myKana].setText("" + getAnswerOptions().get(myKana).getKana());
+            buttonPool[myKana].setOnAction(
+                getAnswerOptions().get(myKana) == rightAnswer ?
+                getOnRightAnswer() : getOnWrongAnswer()
+            );
         }
-        answerChoices.clear();
-        answerChoices.addAll(validater);
     }
 }

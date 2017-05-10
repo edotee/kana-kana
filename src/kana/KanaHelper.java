@@ -138,7 +138,7 @@ public final class KanaHelper {
         addToHashMap(result, a, Katakana.A, Katakana.KA, Katakana.SA, Katakana.TA, Katakana.NA, Katakana.HA, Katakana.MA, Katakana.YA, Katakana.RA, Katakana.WA);
 
         addToHashMap(result, i, Katakana.I, Katakana.KI, Katakana.SHI, Katakana.CHI, Katakana.NI, Katakana.HI, Katakana.MI, null, Katakana.RI, null);
-        addToHashMap(result, u, Katakana.U, Katakana.KU, Katakana.SU, Katakana.TSU, Katakana.NU, Katakana.HU, Katakana.MU, Katakana.YU, Katakana.RU, null);
+        addToHashMap(result, u, Katakana.U, Katakana.KU, Katakana.SU, Katakana.TSU, Katakana.NU, Katakana.FU, Katakana.MU, Katakana.YU, Katakana.RU, null);
         addToHashMap(result, e, Katakana.E, Katakana.KE, Katakana.SE, Katakana.TE, Katakana.NE, Katakana.HE, Katakana.ME, null, Katakana.RE, null);
         addToHashMap(result, o, Katakana.O, Katakana.KO, Katakana.SO, Katakana.TO, Katakana.NO, Katakana.HO, Katakana.MO, Katakana.YO, Katakana.RO, Katakana.WO);
         addToHashMap(result, NOVOW, Katakana.N);
@@ -152,7 +152,7 @@ public final class KanaHelper {
         addToHashMap(result, s, Katakana.SA, Katakana.SHI, Katakana.SU, Katakana.SE, Katakana.SO);
         addToHashMap(result, d, Katakana.TA, Katakana.CHI, Katakana.TSU, Katakana.TE, Katakana.TO);
         addToHashMap(result, n, Katakana.NA, Katakana.NI, Katakana.NU, Katakana.NE, Katakana.NO);
-        addToHashMap(result, h, Katakana.HA, Katakana.HI, Katakana.HU, Katakana.HE, Katakana.HO);
+        addToHashMap(result, h, Katakana.HA, Katakana.HI, Katakana.FU, Katakana.HE, Katakana.HO);
         addToHashMap(result, m, Katakana.MA, Katakana.MI, Katakana.MU, Katakana.ME, Katakana.MO);
         addToHashMap(result, y, Katakana.YA, null, Katakana.YU, null, Katakana.YO);
         addToHashMap(result, r, Katakana.RA, Katakana.RI, Katakana.RU, Katakana.RE, Katakana.RO);
@@ -198,7 +198,7 @@ public final class KanaHelper {
         HashMap<Letter, ArrayList<Hiragana>> result = new HashMap<>();
         addToHashMap(result, a, Hiragana.A, Hiragana.KA, Hiragana.SA, Hiragana.TA, Hiragana.NA, Hiragana.HA, Hiragana.MA, Hiragana.YA, Hiragana.RA, Hiragana.WA);
         addToHashMap(result, i, Hiragana.I, Hiragana.KI, Hiragana.SHI, Hiragana.CHI, Hiragana.NI, Hiragana.HI, Hiragana.MI, null, Hiragana.RI, null);
-        addToHashMap(result, u, Hiragana.U, Hiragana.KU, Hiragana.SU, Hiragana.TSU, Hiragana.NU, Hiragana.HU, Hiragana.MU, Hiragana.YU, Hiragana.RU, null);
+        addToHashMap(result, u, Hiragana.U, Hiragana.KU, Hiragana.SU, Hiragana.TSU, Hiragana.NU, Hiragana.FU, Hiragana.MU, Hiragana.YU, Hiragana.RU, null);
         addToHashMap(result, e, Hiragana.E, Hiragana.KE, Hiragana.SE, Hiragana.TE, Hiragana.NE, Hiragana.HE, Hiragana.ME, null, Hiragana.RE, null);
         addToHashMap(result, o, Hiragana.O, Hiragana.KO, Hiragana.SO, Hiragana.TO, Hiragana.NO, Hiragana.HO, Hiragana.MO, Hiragana.YO, Hiragana.RO, Hiragana.WO);
         addToHashMap(result, NOVOW, Hiragana.N);
@@ -212,7 +212,7 @@ public final class KanaHelper {
         addToHashMap(result, s, Hiragana.SA, Hiragana.SHI, Hiragana.SU, Hiragana.SE, Hiragana.SO);
         addToHashMap(result, d, Hiragana.TA, Hiragana.CHI, Hiragana.TSU, Hiragana.TE, Hiragana.TO);
         addToHashMap(result, n, Hiragana.NA, Hiragana.NI, Hiragana.NU, Hiragana.NE, Hiragana.NO);
-        addToHashMap(result, h, Hiragana.HA, Hiragana.HI, Hiragana.HU, Hiragana.HE, Hiragana.HO);
+        addToHashMap(result, h, Hiragana.HA, Hiragana.HI, Hiragana.FU, Hiragana.HE, Hiragana.HO);
         addToHashMap(result, m, Hiragana.MA, Hiragana.MI, Hiragana.MU, Hiragana.ME, Hiragana.MO);
         addToHashMap(result, y, Hiragana.YA, null, Hiragana.YU, null, Hiragana.YO);
         addToHashMap(result, r, Hiragana.RA, Hiragana.RI, Hiragana.RU, Hiragana.RE, Hiragana.RO);
@@ -250,5 +250,91 @@ public final class KanaHelper {
 
     public static ArrayList<Hiragana> hiraganaValues() {
         return kanaOrder(hiraganaBaseByConsonant(), hiraganaDakutenByConsonant());
+    }
+
+    /* Cross-Kana utility things */
+
+    public static String kanaToRomaji(char searchThiskana) {
+        //we only search one kana syllabary since they should be identical
+        //in case we should ever need to look through both - uncomment the following piece of code
+        /*
+        String romaji = hiraganaToRomaji(searchThiskana);
+        if(romaji.length() == 0)  //
+            romaji = katakanaToRomaji(searchThiskana);
+        return romaji;
+         */
+        return hiraganaToRomaji(searchThiskana);
+    }
+
+    public static String hiraganaToRomaji(char searchThiskana) {
+        Hiragana result = kanaToHiragana(searchThiskana);
+        return (result == null)? "" : result.getRomanji();
+    }
+
+    public static String katakanaToRomaji(char searchThiskana) {
+        Katakana result = kanaToKatakana(searchThiskana);
+        return (result == null)? "" : result.getRomanji();
+    }
+
+    /**
+     * @return returns null if {searchThisKana is not a Hiragana}
+     */
+    public static Hiragana kanaToHiragana(char searchThiskana) {
+        for(Hiragana kana : hiraganaValues())
+            if(kana.getKana() == searchThiskana)
+                return kana;
+        return null;
+    }
+
+    /**
+     * @return returns null if {searchThisKana is not a Katakana}
+     */
+    public static Katakana kanaToKatakana(char searchThiskana) {
+        for(Katakana kana : katakanaValues())
+            if(kana.getKana() == searchThiskana)
+                return kana;
+        return null;
+    }
+
+    /**
+     * @return returns null if {searchThisRomaji} does not describe Hiragana
+     */
+    public static Hiragana romajiToHiragana(String searchThisRomaji) {
+        Hiragana result;
+        try {
+            result = Hiragana.valueOf(searchThisRomaji.trim().toUpperCase());
+        } catch (IllegalArgumentException iae) {
+            iae.printStackTrace();
+            result = null;
+        }
+        return result;
+    }
+
+    /**
+     * @return returns null if {searchThisRomaji} does not describe Katakana
+     */
+    public static Katakana romajiToKatakana(String searchThisRomaji) {
+        Katakana result;
+        try {
+            result = Katakana.valueOf(searchThisRomaji.trim().toUpperCase());
+        } catch (IllegalArgumentException iae) {
+            iae.printStackTrace();
+            result = null;
+        }
+        return result;
+    }
+
+    /**
+     * @return returns the corresponding Katakana of {hiragana}
+     */
+    public static Katakana hiraganaToKatakana(Hiragana hiragana) {
+        return romajiToKatakana(hiragana.getRomanji());
+    }
+
+    /**
+     * @return returns the corresponding Hiragana of {katakana}
+     */
+    public static Hiragana katakanaToHiragana(Hiragana katakana) {
+        return romajiToHiragana(katakana.getRomanji());
     }
 }
