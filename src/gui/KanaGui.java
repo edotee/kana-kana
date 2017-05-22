@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import kana.KanaHelper;
 import kana.hiragana.Hiragana;
 import kana.katakana.Katakana;
 import logic.KanaExercise;
@@ -65,63 +66,45 @@ public class KanaGui extends Application {
         scene = new Scene(startLayout);
         mainWindow.setScene(scene);
 
-        Button goToNextProblem, goToNextExercise;
+        Button goToNextProblem, goToNextExercise, exitExercise;
         HBox buttonBox;
         goToNextProblem = new Button("Next Problem");
-        goToNextProblem.setOnAction( e -> advanceToNextProblem() );
+        goToNextProblem.setOnAction( e -> currentExercise.nextProblem() );
         goToNextExercise = new Button("Next Exercise");
         goToNextExercise.setOnAction( e -> advanceToNextExercise() );
+        exitExercise = new Button("Exit Exercise");
+        exitExercise.setOnAction( e -> scene.setRoot(startLayout) );
         buttonBox = new HBox();
         buttonBox.setStyle("-fx-spacing: 10");
         buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.getChildren().addAll(goToNextProblem, goToNextExercise);
+        buttonBox.getChildren().addAll(goToNextProblem, goToNextExercise, exitExercise);
         exerciseLayout = makeRegionSuitable(new BorderPane());
         exerciseLayout.setBottom(buttonBox);
     }
 
     //TODO rework this so the exercises are dynamically populated
     //requires hiraganaIndex & katakanaIndex to be initialized & populized
-    private void initExercises() {
+    public void initExercises() {
         ArrayList<KanaExercise> exerciseList = new ArrayList<>();
-        /*
-        exerciseList.add( new PickTheRightKana<>(
-                pickedHiragana,             //Kanas to test
-                e -> advanceToNextProblem(),        //perform this action on right answer
-                e -> System.out.println("Idiot!"),  //... wrong answer
-                e -> advanceToNextProblem(),        //... skipping a problem
-                e -> advanceToNextExercise()        //.. on completing an exercise
-        ));
-        exerciseList.add( new PickTheRightKana<>(
-                pickedKatakana,
-                e -> advanceToNextProblem(),
-                e -> System.out.println("あほ! Aho! ばか! Baka!"),
-                e -> advanceToNextProblem(),
-                e -> advanceToNextExercise()
-        ));
-        exerciseList.add( new WriteTheRightKana<>(
-                pickedHiragana,
-                e -> advanceToNextProblem(),
-                e -> advanceToNextProblem(),
-                e -> advanceToNextExercise()
-        ));
-        */
+
         exerciseList.add( new TypeTheRomaji<>(
-                pickedHiragana,
-                e -> advanceToNextProblem(),
-                e -> System.out.println("あほ! Aho! ばか! Baka!"),
-                e -> advanceToNextProblem(),
+                KanaHelper.hiraganaBaseValues(), pickedHiragana,
                 e -> advanceToNextExercise()
         ));
+
+        exerciseList.add( new TypeTheRomaji<>(
+                KanaHelper.katakanaBaseValues(), pickedKatakana,
+                e -> advanceToNextExercise()
+        ));
+
         exerciseList.add( new WriteTheRightKana<>(
-                pickedHiragana,
-                e -> advanceToNextProblem(),
-                e -> advanceToNextProblem(),
+                KanaHelper.hiraganaBaseValues(), pickedHiragana,
                 e -> advanceToNextExercise()
         ));
         exercises = exerciseList.iterator();
     }
 
-    private void advanceToNextExercise() {
+    public void advanceToNextExercise() {
         if(exercises.hasNext()) {
             currentExercise = exercises.next();
             exerciseLayout.setCenter(currentExercise.getGui());
@@ -131,16 +114,11 @@ public class KanaGui extends Application {
         }
     }
 
-    private void advanceToNextProblem() {
-        currentExercise.nextProblem();
-    }
-
     // GUI creation methods
 
     //requires hiraganaIndex & katakanaIndex to be initialized
     //populates hiraganaIndex & katakanaIndex
     private Node createCenterNode() {
-
         TabPane centerNode = KanaGui.makeRegionSuitable(new TabPane());
         centerNode.getTabs().addAll(
                 GuiHelper.getExercisePickerTab(),

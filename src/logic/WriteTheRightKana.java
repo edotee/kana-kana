@@ -10,6 +10,7 @@ import javafx.scene.layout.*;
 import javafx.scene.text.TextAlignment;
 import kana.Kana;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
@@ -24,11 +25,17 @@ public class WriteTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
     private Button[] buttonPool;
     private Label[] labelPool;
 
-    public WriteTheRightKana(HashSet<T> targetKana,
-                            EventHandler<ActionEvent> onRightAnswer,
-                            EventHandler<ActionEvent> onSkip,
+    public WriteTheRightKana(ArrayList<T> completeList, HashSet<T> targetKana,
                             EventHandler<ActionEvent> onComplete) {
-        super(targetKana, onRightAnswer, null, onSkip, onComplete);
+        super(completeList, targetKana, null, null, onComplete);
+    }
+
+    @Override public void onRightAnswer() {
+        //TODO
+    }
+
+    @Override public void onWrongAnswer() {
+        //TODO
     }
 
     @Override protected void initFields() { }
@@ -83,9 +90,18 @@ public class WriteTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
 
     @Override protected void prepareNextProblem() {
         for(int i = 0; i < getAmount(); i++) {
-            buttonPool[i].setText("" + getAnswerOptions().get(i).getRomanji());
-            labelPool[i].setText("" + getAnswerOptions().get(i).getKana());
+            buttonPool[i].setText("" + getCurrentAnswerOptions().get(i).getRomanji());
+            labelPool[i].setText("" + getCurrentAnswerOptions().get(i).getKana());
             labelPool[i].setVisible(false);
         }
+        getAnswerLog().addAll(0, getCurrentAnswerOptions());
+    }
+
+    @Override protected int getAmount() {
+        return 5;
+    }
+
+    @Override protected int getRelevantLogDepth() {
+        return getAmount()*2;
     }
 }

@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import kana.Kana;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
@@ -26,14 +27,21 @@ public class PickTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
     private HBox answerArea;
     private Button[] buttonPool;
 
-    private T rightAnswer;
+    private int rightAnswer;
 
-    public PickTheRightKana(HashSet<T> targetKana,
+    public PickTheRightKana(ArrayList<T> completeList, HashSet<T> targetKana,
                             EventHandler<ActionEvent> onRightAnswer,
                             EventHandler<ActionEvent> onWrongAnswer,
-                            EventHandler<ActionEvent> onSkip,
                             EventHandler<ActionEvent> onComplete) {
-        super(targetKana, onRightAnswer, onWrongAnswer, onSkip, onComplete);
+        super(completeList, targetKana, onRightAnswer, onWrongAnswer, onComplete);
+    }
+
+    @Override public void onRightAnswer() {
+        //TODO
+    }
+
+    @Override public void onWrongAnswer() {
+        //TODO
     }
 
     @Override protected void initFields() { }
@@ -68,20 +76,42 @@ public class PickTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
         return layout;
     }
 
-    @Override
-    protected void prepareFirstProblem() {
+    @Override protected void prepareFirstProblem() {
         prepareNextProblem();
     }
 
     @Override protected void prepareNextProblem() {
-        rightAnswer = super.randomAnswer(rightAnswer);
-        inQuestion.setText("" + rightAnswer.getRomanji());
+        rightAnswer = dice(getAmount());
+        getAnswerLog().addAll(getCurrentAnswerOptions());
+        while(getAnswerLog().size() > 10)
+            getAnswerLog().remove(10);
+
+        inQuestion.setText("" + getAnswerLog().get(rightAnswer).getRomanji());
         for(int myKana = 0; myKana < getAmount(); myKana++) {
-            buttonPool[myKana].setText("" + getAnswerOptions().get(myKana).getKana());
+            buttonPool[myKana].setText("" + getCurrentAnswerOptions().get(myKana).getKana());
             buttonPool[myKana].setOnAction(
-                getAnswerOptions().get(myKana) == rightAnswer ?
+                getCurrentAnswerOptions().get(myKana) == getAnswerLog().get(rightAnswer) ?
                 getOnRightAnswer() : getOnWrongAnswer()
             );
         }
+        /*
+        rightAnswer = randomAnswerFromOptions();
+        inQuestion.setText("" + rightAnswer.getRomanji());
+        for(int myKana = 0; myKana < getAmount(); myKana++) {
+            buttonPool[myKana].setText("" + getCurrentAnswerOptions().get(myKana).getKana());
+            buttonPool[myKana].setOnAction(
+                getCurrentAnswerOptions().get(myKana) == rightAnswer ?
+                getOnRightAnswer() : getOnWrongAnswer()
+            );
+        }
+         */
+    }
+
+    @Override protected int getAmount() {
+        return 5;
+    }
+
+    @Override protected int getRelevantLogDepth() {
+        return 3;
     }
 }

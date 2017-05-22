@@ -1,7 +1,9 @@
 package kana;
 
 import kana.hiragana.Hiragana;
+import kana.hiragana.HiraganaYoon;
 import kana.katakana.Katakana;
+import kana.katakana.KatakanaYoon;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -336,5 +338,35 @@ public final class KanaHelper {
      */
     public static Hiragana katakanaToHiragana(Hiragana katakana) {
         return romajiToHiragana(katakana.getRomanji());
+    }
+
+    public static Yoon isYoon(Kana lead, Kana post) {
+        Yoon result = null;
+        if(lead instanceof Hiragana && post instanceof Hiragana) {
+            switch((Hiragana)lead) {
+                case KI:case GI:case SHI:case JI:case CHI:case DZI:case NI:case HI:case BI:case PI:case MI:case RI:
+                    break;
+                default: return result;
+            }
+            switch((Hiragana)post) {
+                case YA:case YU:case YO:
+                    break;
+                default: return result;
+            }
+            result = HiraganaYoon.match((Hiragana)lead, (Hiragana)post);
+        } else if(lead instanceof Katakana && post instanceof Katakana){
+            switch((Katakana)lead) {
+                case KI:case GI:case SHI:case JI:case CHI:case DZI:case NI:case HI:case BI:case PI:case MI:case RI:
+                    break;
+                default: return result;
+            }
+            switch((Katakana)post) {
+                case YA:case YU:case YO:
+                    break;
+                default: return result;
+            }
+            result = KatakanaYoon.match((Katakana)lead, (Katakana)post);
+        }
+        return result;
     }
 }

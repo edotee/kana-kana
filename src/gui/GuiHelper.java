@@ -25,7 +25,7 @@ import java.util.HashMap;
  */
 public class GuiHelper {
 
-    private static <T extends Kana> GridPane getKanaPicker(HashMap<ToggleButton, T> guiButtonKanaIndex, HashMap<Letter, ArrayList<T>> kanaMap) {
+    private static <T extends Kana> GridPane getKanaPicker(HashMap<ToggleButton, T> guiButtonKanaIndex, HashMap<Letter, ArrayList<T>> kanaMap, String[] defaultSelected) {
         GridPane kanaTable = KanaGui.makeRegionSuitable(new GridPane());
         kanaTable.setAlignment(Pos.CENTER);
         Letter[] keys = Vowel.values();
@@ -37,41 +37,21 @@ public class GuiHelper {
             if(list != null) {
                 x = 0;
                 for(T kana : list) {
-                    /*
                     if(kana != null) {
                         ToggleButton button = new ToggleButton("" + kana.getKana());
                         GridPane.setConstraints(button, x, y);
                         button.setStyle("-fx-font: 36 arial; -fx-background-radius: 0;");
                         kanaTable.getChildren().add(button);
                         guiButtonKanaIndex.put(button, kana);
+
+                        for(String romaji : defaultSelected) {
+                            if(kana.getRomanji().equals(romaji)) {
+                                button.setSelected(true);
+                                break;
+                            }
+                        }
                     }
                     x++;
-                    */
-                    if(kana != null) {
-                        ToggleButton button = new ToggleButton("" + kana.getKana());
-                        GridPane.setConstraints(button, x, y);
-                        button.setStyle("-fx-font: 36 arial; -fx-background-radius: 0;");
-                        kanaTable.getChildren().add(button);
-                        guiButtonKanaIndex.put(button, kana);
-                        switch(kana.getRomanji()) {
-                            case "a":
-                            case "i":
-                            case "u":
-                            case "e":
-                            case "o":
-                            case "n":
-                            case "ka":
-                            case "ni":
-                            case "no":
-                            case "wa":
-                            case "wo":
-                            case "ga":
-                                button.setSelected(true);
-                                //TODO make it permanent... but HOW?!
-                            break;
-                        }
-                        x++;
-                    }
                 }
                 y++;
             }
@@ -80,11 +60,15 @@ public class GuiHelper {
     }
 
     public static GridPane getHiraganaPicker(HashMap<ToggleButton, Hiragana> hiraganaIndex) {
-        return getKanaPicker(hiraganaIndex, KanaHelper.hiraganaBaseByVowel());
+        return getKanaPicker(hiraganaIndex, KanaHelper.hiraganaBaseByVowel(),
+                "a i u e o ka ki ku ke ko sa shi su se so ta chi tsu te to na ni nu ne no n ha hi fu he ho ma mi mu me mo ya yu yo ra ri ru re ro wa wo".trim().split(" ")
+        );
     }
 
     public static GridPane getKatakanaPicker(HashMap<ToggleButton, Katakana> katakanaIndex) {
-        return getKanaPicker(katakanaIndex, KanaHelper.katakanaBaseByVowel());
+        return getKanaPicker(katakanaIndex, KanaHelper.katakanaBaseByVowel(),
+                "a i u e o ka ki ni ha fu he mi ya yu yo ri".trim().split(" ")
+        );
     }
 
     public static Tab getHiraganaPickerTab(HashMap<ToggleButton, Hiragana> hiraganaIndex) {

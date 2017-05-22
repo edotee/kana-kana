@@ -47,7 +47,7 @@ public enum Hiragana implements Kana<Hiragana> {
 
     HA('は', h, a),
     HI('ひ', h, i),
-    FU('フ', h, u, "fu"), HU(FU.kana, FU.consonant, FU.vowel, FU.getRomanji()),
+    FU('ふ', h, u, "fu"), HU(FU.kana, FU.consonant, FU.vowel, FU.getRomanji()),
     HE('へ', h, e),
     HO('ほ', h, o),
 
