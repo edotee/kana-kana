@@ -12,6 +12,7 @@ import kana.KanaHelper;
 import kana.hiragana.Hiragana;
 import kana.katakana.Katakana;
 import logic.KanaExercise;
+import logic.PickTheRightKana;
 import logic.TypeTheRomaji;
 import logic.WriteTheRightKana;
 
@@ -69,10 +70,13 @@ public class KanaGui extends Application {
         Button goToNextProblem, goToNextExercise, exitExercise;
         HBox buttonBox;
         goToNextProblem = new Button("Next Problem");
+        goToNextProblem.setFocusTraversable(false);
         goToNextProblem.setOnAction( e -> currentExercise.nextProblem() );
         goToNextExercise = new Button("Next Exercise");
+        goToNextExercise.setFocusTraversable(false);
         goToNextExercise.setOnAction( e -> advanceToNextExercise() );
         exitExercise = new Button("Exit Exercise");
+        exitExercise.setFocusTraversable(false);
         exitExercise.setOnAction( e -> scene.setRoot(startLayout) );
         buttonBox = new HBox();
         buttonBox.setStyle("-fx-spacing: 10");
@@ -87,6 +91,7 @@ public class KanaGui extends Application {
     public void initExercises() {
         ArrayList<KanaExercise> exerciseList = new ArrayList<>();
 
+        /*
         exerciseList.add( new TypeTheRomaji<>(
                 KanaHelper.hiraganaBaseValues(), pickedHiragana,
                 e -> advanceToNextExercise()
@@ -96,6 +101,12 @@ public class KanaGui extends Application {
                 KanaHelper.katakanaBaseValues(), pickedKatakana,
                 e -> advanceToNextExercise()
         ));
+
+        exerciseList.add( new PickTheRightKana<>(
+                KanaHelper.hiraganaBaseValues(), pickedHiragana,
+                e -> advanceToNextExercise()
+        ));
+        */
 
         exerciseList.add( new WriteTheRightKana<>(
                 KanaHelper.hiraganaBaseValues(), pickedHiragana,

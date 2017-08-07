@@ -1,0 +1,146 @@
+.previousKana{
+    -fx-alignment: center;
+    -fx-font: 50 arial;
+    -fx-text-alignment: center;
+}
+
+.previousKanaHide{
+    -fx-alignment: center;
+    -fx-font: 50 arial;
+    -fx-text-alignment: center;
+    -fx-text-fill: white;
+}
+
+.previousKanaDouble{
+    -fx-alignment: center;
+    -fx-font: 50 arial;
+    //-fx-font-style: italic;
+    -fx-text-alignment: center;
+    -fx-text-fill: steelblue;
+}
+
+.previousKanaYoon{
+    -fx-alignment: center;
+    -fx-font: 50 arial;
+    //-fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-text-fill: gold;
+}
+
+.previousKanaMissedYoon{
+    -fx-alignment: center;
+    -fx-font: 50 arial;
+    -fx-text-fill: lightblue;
+    -fx-text-alignment: center;
+}
+
+.previousKanaWrong{
+    -fx-alignment: center;
+    -fx-font: 50 arial;
+    -fx-text-fill: red;
+    -fx-text-alignment: center;
+}
+
+.previousKanaFoul{
+    -fx-alignment: center;
+    -fx-font: 50 arial;
+    -fx-text-fill: yellowgreen;
+    -fx-text-alignment: center;
+}
+
+.currentKana{
+    -fx-alignment: center;
+    -fx-font: 70 arial;
+    -fx-text-alignment: center;
+}
+
+.currentKanaDouble{
+    -fx-alignment: center;
+    -fx-font: 70 arial;
+    //-fx-font-style: italic;
+    -fx-text-alignment: center;
+    -fx-text-fill: steelblue;
+}
+
+.currentKanaYoon{
+    -fx-alignment: center;
+    -fx-font: 70 arial;
+    //-fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-text-fill: gold;
+}
+
+.currentKanaWrong{
+    -fx-alignment: center;
+    -fx-font: 70 arial;
+    -fx-text-alignment: center;
+    -fx-text-fill: red;
+}
+
+.currentKanaFoul{
+    -fx-alignment: center;
+    -fx-font: 70 arial;
+    -fx-text-alignment: center;
+    -fx-text-fill: yellowgreen;
+}
+
+.upcomingKana{
+    -fx-alignment: center;
+    -fx-font: 50 arial;
+    -fx-text-alignment: center;
+}
+
+.romaji{
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+    -fx-font: 24 arial;
+}
+
+.romajiHide{
+    -fx-alignment: center;
+    -fx-font: 24 arial;
+    -fx-text-alignment: center;
+    -fx-text-fill: white;
+}
+
+.romajiYoon{
+    -fx-alignment: center;
+    -fx-font: 24 arial;
+    -fx-text-alignment: center;
+    -fx-text-fill: gold;
+}
+
+.romajiMissedYoon{
+    -fx-alignment: center;
+    -fx-font: 24 arial;
+    -fx-text-alignment: center;
+    -fx-text-fill: lightblue;
+}
+
+.romajiWrong{
+    -fx-alignment: center;
+    -fx-font: 24 arial;
+    -fx-text-alignment: center;
+    -fx-text-fill: red;
+}
+
+.question{
+    -fx-font: 36 arial;
+    -fx-text-alignment: center;
+}
+
+.questionArea{
+    -fx-alignment: center;
+}
+
+.answerArea{
+    -fx-alignment: center;
+    -fx-background-color: green;
+    //-fx-padding: 10px, 10px, 10px, 10px;
+}
+
+.answerInput{
+    -fx-alignment: center;
+    -fx-background-color: white;
+    //HBox.setHgrow(answerInput, Priority.ALWAYS);
+}

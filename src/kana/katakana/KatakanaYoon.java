@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import static kana.katakana.Katakana.*;
 
 /**
+ * TODO preparation notes - only used by TypeTheRomaji.isYoon()
  * @author edotee
  */
 public enum KatakanaYoon implements Yoon {
@@ -78,8 +79,8 @@ public enum KatakanaYoon implements Yoon {
         this.alternateReading = alternateReading;
     }
 
-    @Override public String getDigraph() {
-        return "" + leading.kana + following.kana;
+    @Override public String getKana() {
+        return "" + leading.kana + (char)(following.kana -1);
     }
 
     @Override public String getRomanji() {

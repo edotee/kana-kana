@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import static kana.hiragana.Hiragana.*;
 
 /**
+ * TODO preparation notes - only used by TypeTheRomaji.isYoon()
  * @author edotee
  */
 public enum HiraganaYoon implements Yoon {
@@ -78,8 +79,8 @@ public enum HiraganaYoon implements Yoon {
         this.alternateReading = alternateReading;
     }
 
-    @Override public String getDigraph() {
-        return "" + leading.kana + following.kana;
+    @Override public String getKana() {
+        return "" + leading.kana + (char)(following.kana -1);
     }
 
     @Override public String getRomanji() {
@@ -101,9 +102,9 @@ public enum HiraganaYoon implements Yoon {
 
     public static HiraganaYoon match(Hiragana leading, Hiragana following) {
         HiraganaYoon result = null;
-        for(HiraganaYoon hiraganaYoon : filter(leading))
-            if(hiraganaYoon.following == following)
-                result = hiraganaYoon;
+        for(HiraganaYoon yoon : filter(leading))
+            if(yoon.following == following)
+                result = yoon;
         return result;
     }
 }

@@ -1,6 +1,7 @@
 package kana;
 
 /**
+ * TODO preparation notes - only used by Hiragana & Katakana
  * @author edotee
  */
 public enum Dakuten {

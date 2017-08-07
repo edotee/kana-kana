@@ -2,6 +2,7 @@ package logic;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.layout.Region;
 import kana.Kana;
 
@@ -24,7 +25,7 @@ public abstract class KanaExercise<T extends Kana<T>> {
     private final ArrayList<T> completeList;            //The general pool of kana that will be tested
     private final HashSet<T> targetKana;                //The general pool of kana that will be tested
     private final ArrayList<T> targetKanaAsArrayList;   //The general pool of kana that will be tested
-    private final EventHandler<ActionEvent> onRightAnswer, onWrongAnswer, onComplete;
+    private final EventHandler<ActionEvent> onComplete;
     private final Region gui;
 
     private Random rng;
@@ -35,29 +36,26 @@ public abstract class KanaExercise<T extends Kana<T>> {
     private ArrayList<T> answerOptions;     //Pool of currently used kana
 
     public KanaExercise(ArrayList<T> completeList, HashSet<T> targetKana,
-                        EventHandler<ActionEvent> onRightAnswer,
-                        EventHandler<ActionEvent> onWrongAnswer,
                         EventHandler<ActionEvent> onComplete) {
         this.completeList = completeList;
         this.targetKana = targetKana;
         targetKanaAsArrayList = new ArrayList<T>(targetKana);
-        this.onRightAnswer = onRightAnswer;
-        this.onWrongAnswer = onWrongAnswer;
         this.onComplete = onComplete;
 
         rng = new Random(System.currentTimeMillis());
         initFields();
         gui = initGUI();
+        applyCSS();
         answerLog = new ArrayList<>();
         answerOptions = new ArrayList<>();
-        pickMyOwnAnswers();
-        prepareFirstProblem();
+        firstProblem();
     }
 
     /* Abstract Methods */
 
     protected abstract void initFields();
     protected abstract Region initGUI();
+    protected abstract void applyCSS();
 
     protected abstract void prepareFirstProblem();
     protected abstract void prepareNextProblem();
@@ -65,11 +63,12 @@ public abstract class KanaExercise<T extends Kana<T>> {
     protected abstract int getAmount();
     protected abstract int getRelevantLogDepth();
 
-    public abstract void onRightAnswer();
-    public abstract void onWrongAnswer();
-
     /* Methods for external Logics */
 
+    private void firstProblem() {
+        pickMyOwnAnswers();
+        prepareFirstProblem();
+    }
     public void nextProblem() {
         pickMyOwnAnswers();
         prepareNextProblem();
@@ -83,6 +82,14 @@ public abstract class KanaExercise<T extends Kana<T>> {
     private void pickMyOwnAnswers() {
         answerOptions.clear();
         answerOptions.addAll(pickOptions());
+    }
+
+    /**
+     * Helper method for CSS stuff
+     */
+    protected void setCssClass(Node node, String newStyleClass) {
+        node.getStyleClass().clear();
+        node.getStyleClass().add(newStyleClass);
     }
 
     /**
@@ -195,14 +202,6 @@ public abstract class KanaExercise<T extends Kana<T>> {
 
     public ArrayList<T> getTargetKanaAsArrayList() {
         return targetKanaAsArrayList;
-    }
-
-    public EventHandler<ActionEvent> getOnRightAnswer() {
-        return onRightAnswer;
-    }
-
-    public EventHandler<ActionEvent> getOnWrongAnswer() {
-        return onWrongAnswer;
     }
 
     public EventHandler<ActionEvent> getOnComplete() {

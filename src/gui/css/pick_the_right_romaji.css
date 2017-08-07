@@ -1,0 +1,22 @@
+.question{
+    -fx-font: 36 arial;
+    -fx-text-alignment: center;
+}
+.inQuestion{
+    -fx-font: 70 arial;
+    -fx-text-alignment: center;
+}
+.questionArea{
+    -fx-alignment: center;
+}
+
+.answerArea{
+    -fx-alignment: center;
+    -fx-background-color: firebrick;
+    -fx-spacing: 10
+}
+
+.buttonPoolButton{
+    -fx-background-color: lightblue;
+    -fx-font: 36 arial;
+}

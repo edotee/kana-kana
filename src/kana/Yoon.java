@@ -5,6 +5,6 @@ package kana;
  * @author edotee
  */
 public interface Yoon {
-    String getDigraph();
+    String getKana();
     String getRomanji();
 }

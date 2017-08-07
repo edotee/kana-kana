@@ -1,0 +1,38 @@
+.answerArea{
+    -fx-alignment: center;
+    -fx-background-color: green;
+    -fx-spacing: 10
+}
+
+.question{
+    -fx-font: 36 arial;
+    -fx-text-alignment: center;
+}
+
+.questionArea{
+    -fx-alignment: center;
+}
+
+.labelPoolLabel{
+    -fx-alignment: center;
+    -fx-background-color: lightblue;
+    -fx-font: 36 arial;
+    -fx-text-fill: black;
+    //label.setPrefSize(125.0f, 125.0f);//adhoc solution
+}
+
+.labelPoolLabelHide{
+    -fx-alignment: center;
+    -fx-background-color: lightblue;
+    -fx-font: 36 arial;
+    -fx-text-fill: lightblue;
+    //label.setPrefSize(125.0f, 125.0f);//adhoc solution
+}
+
+.buttonPoolButton{
+    -fx-alignment: center;
+    -fx-background-color: lightblue;
+    -fx-font: 36 arial;
+    -fx-text-fill: black;
+    //button.setPrefSize(125.0f, 125.0f);//adhoc solution
+}
