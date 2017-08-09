@@ -1,22 +1,21 @@
-package logic;
+package moe.edotee.kanakana.logic;
 
-import gui.KanaGui;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.*;
-import kana.Kana;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 
-import java.util.ArrayList;
+import moe.edotee.kanakana.kana.Kana;
+import moe.edotee.kanakana.utils.Options;
+
 import java.util.HashSet;
 
 /**
  * @author edotee
  */
-public class WriteTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
-
-    private final String CSS_FILE_PATH = "gui/css/write_the_right_kana.css";
+public class WriteTheKana<T extends Kana> extends KanaExercise<T> {
 
     private BorderPane layout;
     private Label question;
@@ -25,9 +24,8 @@ public class WriteTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
     private Button[] buttonPool;
     private Label[] labelPool;
 
-    public WriteTheRightKana(ArrayList<T> completeList, HashSet<T> targetKana,
-                            EventHandler<ActionEvent> onComplete) {
-        super(completeList, targetKana, onComplete);
+    public WriteTheKana(HashSet<T> targetKana, String cssPath) {
+        super(targetKana, cssPath);
     }
 
     @Override protected void initFields() {
@@ -47,7 +45,7 @@ public class WriteTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
         /* Answer Area */
         populateLabelPool();
 
-        layout = KanaGui.makeRegionSuitable(layout);
+        layout.setPrefSize(Options.WIDTH, Options.HEIGHT);
         layout.setTop(questionArea);
         layout.setCenter(answerArea);
 
@@ -77,8 +75,8 @@ public class WriteTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
         }
     }
 
-    @Override protected void applyCSS() {
-        layout.getStylesheets().add(CSS_FILE_PATH);
+    @Override protected void applyCSS(String css_file_path) {
+        layout.getStylesheets().add(css_file_path);
         setCssClass(answerArea, "answerArea");
         setCssClass(question, "question");
         setCssClass(questionArea, "questionArea");
@@ -90,18 +88,22 @@ public class WriteTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
 
     @Override protected void prepareNextProblem() {
         for(int i = 0; i < getAmount(); i++) {
-            buttonPool[i].setText("" + getCurrentAnswerOptions().get(i).getRomanji());
+            buttonPool[i].setText("" + getCurrentAnswerOptions().get(i).getRomaji());
             labelPool[i].setText("" + getCurrentAnswerOptions().get(i).getKana());
             setCssClass(labelPool[i], "labelPoolLabelHide");
         }
         getAnswerLog().addAll(0, getCurrentAnswerOptions());
     }
 
+    @Override public void onComplete() {
+
+    }
+
     @Override protected int getAmount() {
-        return 5;
+        return Options.WriteKana.AMOUNT;
     }
 
     @Override protected int getRelevantLogDepth() {
-        return getAmount()*2;
+        return Options.WriteKana.DEPTH;
     }
 }

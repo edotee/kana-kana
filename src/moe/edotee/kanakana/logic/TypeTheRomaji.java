@@ -1,32 +1,28 @@
-package logic;
+package moe.edotee.kanakana.logic;
 
-import gui.KanaGui;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.Priority;
 
-import kana.Kana;
-import kana.Yoon;
-import kana.hiragana.Hiragana;
-import kana.hiragana.HiraganaYoon;
-import kana.katakana.Katakana;
-import kana.katakana.KatakanaYoon;
+import moe.edotee.kanakana.kana.Kana;
+import moe.edotee.kanakana.kana.Yoon;
+import moe.edotee.kanakana.utils.Options;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
  * @author edotee
  */
-public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
+public class TypeTheRomaji<T extends Kana> extends KanaExercise<T> {
 
     private final int CURRENT_KANA = 1;
-    private final boolean SHOW_ROMAJI = true;
-    private final String CSS_FILE_PATH = "gui/css/type_the_romaji.css";
 
     private BorderPane layout;
     private Label question, currentKana, previousKana, upcomingKana, previousRomaji, currentRomaji, upcomingRomaji;
@@ -34,7 +30,7 @@ public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
     private TextField answerInput;
     private HBox answerArea;
 
-    //We initiated the following fields to avoid unnecessary GC work, since they'll be (in)directly used in each pass of handleInput()
+    /* We initiated the following fields to avoid unnecessary GC work, since they'll be (in)directly used in each pass of handleInput() */
     //input, yoon and resultCase are used in handleInput
     private String input;
     private Yoon yoon;
@@ -42,22 +38,30 @@ public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
     //logOutput is virtually used in every sub-branch of handleInput()
     private String logOutput;
     //discardOffset is virtually used whenever the user makes typos - which should happen enough in a learning tool to justify the promotion
-    private int discardOffset;
     //the discardOffset dictates which entry will be pushed/discarded
     //after some tinkering and thinking, it basically tells you which inputs are wrong
     ////-2 = none
     ////-1 = all
     //// 0 = the 1st entry is wrong
     //// 1 = the 2nd entry is wrong
+    private int discardOffset;
+    //call_nextProblem allows us to preemptively call nextProblem() if needed and bypass its usual call
+    //at the end of handleInput()
+    //  -> nextProblem() calls prepareNextProblem() which will set c_nP to false
+    //  -> handleInput() resets c_nP at the beginning of the call and calls nextProblem() at the end of its call
+    //      if c_nP is still true
+    //  -> event handling occurs between resetting and the check, so any call in between will cancel the call at the end
     private boolean call_nextProblem;
 
-    public TypeTheRomaji(ArrayList<T> completeList, HashSet<T> targetKana,
-                         EventHandler<ActionEvent> onComplete) {
-        super(completeList, targetKana, onComplete);
+    public TypeTheRomaji(HashSet<T> targetKana, String cssPath) {
+        super(targetKana, cssPath);
     }
 
+
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    /* Methods */
+
     /**
-     *
      * Calls {@link #evaluateInput() evaluateInput()} to determine the type of input.
      * The returned type will be checked in a switch-case and appropriate actions
      * will be made in the methods called in the cases.
@@ -65,12 +69,12 @@ public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
      */
     private void handleInput(KeyEvent keyEvent) {
         if(keyEvent.getCode() == KeyCode.ENTER || keyEvent.getCode() == KeyCode.SPACE) {
-            //TODO add some smart regex to sort handle potato finger inputs (double consonants, ending with a consonant other than n, not ending on a vowel other than n
+            //TODO add some smart regex to sort handle / potato finger inputs (double consonants, ending with a consonant other than n, not ending on a vowel (excluding n)
             //split input at each vowel(a,i,u,e,o) and at each n that is followed by a non-vowel / consonant or ' -> enka -> e nka _> e n ka
             //nana -> na na | nan'a -> na n'a -> na n a
             input = answerInput.getText().toLowerCase().replace(" ", "");
             answerInput.setText(input);
-            yoon = isYoon(getAnswerLog().get(CURRENT_KANA), getAnswerLog().get(CURRENT_KANA-1));
+            yoon = fetchYoon(getAnswerLog().get(CURRENT_KANA), getAnswerLog().get(CURRENT_KANA-1));
             resultCase = evaluateInput();
             logOutput = "";
             discardOffset = 0;
@@ -105,30 +109,38 @@ public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
 
     /**
      * Helper method that is called in {@link #handleInput(KeyEvent keyEvent) handleInput()} and {@return}s the type of input given
-     */
+     */ //TODO maybe implement partly wrong (1st correct, 2nd wrong / the other way around / implement a boolean[] field that tells which input is wrong
     private InputResult evaluateInput() {
         InputResult result = InputResult.INVALID;
         if(input.length() > 0) {
-            if (getAnswerLog().get(CURRENT_KANA).getRomanji().equals(input)) {
+            if (getAnswerLog().get(CURRENT_KANA).getRomaji().equals(input))
                 result = InputResult.CORRECT;
-            } else if (yoon != null) {
-                if (yoon.getRomanji().equals(input))
-                    result = InputResult.YOON;
-                else if ((getAnswerLog().get(CURRENT_KANA).getRomanji() + getAnswerLog().get(CURRENT_KANA-1).getRomanji()).equals(input))
-                    result = InputResult.MISSED_YOON;
-                else    //TODO maybe implement partly wrong (1st correct, 2nd wrong / the other way around / implement a boolean[] field that tells which input is wrong
-                    result = InputResult.WRONG; //potential double_wrong / half_wrong -> 0/2 or 1/2
-            } else if ((getAnswerLog().get(CURRENT_KANA).getRomanji() + getAnswerLog().get(CURRENT_KANA-1).getRomanji()).equals(input)) {
-                if (getAnswerLog().get(CURRENT_KANA).getRomanji().equals("wo") || getAnswerLog().get(CURRENT_KANA-1).getRomanji().equals("wo"))
-                    result = InputResult.FOUL;
-                else
-                    result = InputResult.DOUBLE_CORRECT;
-            } else {
-                result = InputResult.WRONG; //single_wrong -> 1 romaji input - 100% fail -> 0/1
-            }
+            else if(yoon != null) {
+                if(yoon.getRomaji().equals(input)) result = InputResult.YOON;
+                else if(  returnsDoubleCorrect()  ) result = InputResult.MISSED_YOON;
+                else result = InputResult.WRONG;    //potential double_wrong / half_wrong -> 0/2 or 1/2
+            } else if(  returnsDoubleCorrect()  ) {
+                if(  isFoul_WO()  ) result = InputResult.FOUL;
+                else result = InputResult.DOUBLE_CORRECT;
+            } else result = InputResult.WRONG;      //single_wrong -> 1 romaji input - 100% fail -> 0/1
         }
         return result;
     }
+
+    // Helper methods for evaluateInput() | +1 readability
+    private boolean returnsDoubleCorrect() {
+        return (  getAnswerLog().get(CURRENT_KANA).getRomaji() + getAnswerLog().get(CURRENT_KANA-1).getRomaji()  ).equals(input);
+    }
+    private boolean isFoul_WO() {
+        return  Options.TypeRomaji.Fouls.CHECK && Options.TypeRomaji.Fouls.WO
+        && (    getAnswerLog().get(CURRENT_KANA).getRomaji().equals("wo")
+              ||getAnswerLog().get(CURRENT_KANA-1).getRomaji().equals("wo")
+        );
+    }
+
+
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    /* Result handler */
 
     /**
      * Branched-off sub-routine for input evaluation that is called in {@link #handleInput(KeyEvent keyEvent) handleInput()}
@@ -156,14 +168,10 @@ public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
     private void onYoon() {
         styleKana("previousKanaYoon", "currentKanaYoon");
         styleRomaji("romajiYoon", "romajiYoon", "romajiHide");
-        /*
-        previousKana.setText("" + getAnswerLog().get(CURRENT_KANA).getKana()    //leading Kana
-                + (char)(  getAnswerLog().get(CURRENT_KANA-1).getKana()-1)  );  //ya/yu/yo in small
-        */
         nextProblem();
-        previousKana.setText(yoon.getKana());
-        previousRomaji.setText(input); //TODO yoon.getRomanji() only return the romaji of the 1st kana and not of the yoon
-        logOutput = "Yoon! – " + yoon.getKana() + " ~ " + input/*+ yoon.getRomaji()*/;
+        previousKana.setText(getYoonKana());
+        previousRomaji.setText(input); //or input
+        logOutput = "Yoon! – " + getYoonKana() + " ~ " + input;
         //discardOffset = 1;
     }
 
@@ -173,11 +181,7 @@ public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
      */
     private void onMissedYoon() {
         stylePrevious("previousKanaMissedYoon", "romajiMissedYoon");
-        /*
-        previousKana.setText("" + getAnswerLog().get(CURRENT_KANA).getKana()    //leading Kana
-                + (char)(  getAnswerLog().get(CURRENT_KANA-1).getKana()-1)  );  //ya/yu/yo in small;
-        */
-        logOutput = "Missed a Yoon! – " + yoon.getKana() /* + " ~ " + yoon.getRomaji()*/;
+        logOutput = "Missed a Yoon! – " + getYoonKana() + " ~ " + yoon.getRomaji();
     }
 
     /**
@@ -207,13 +211,13 @@ public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
             //1st kana wrong
             styleKana("previousKanaWrong", "currentKana");
             styleRomaji("romajiWrong", "romajiHide");
-            logOutput = "" + getAnswerLog().get(CURRENT_KANA).getKana() + " != " + input.replace(getAnswerLog().get(CURRENT_KANA - 1).getRomanji(), "");
+            logOutput = "" + getAnswerLog().get(CURRENT_KANA).getKana() + " != " + input.replace(getAnswerLog().get(CURRENT_KANA - 1).getRomaji(), "");
         }
         else if(discardOffset == 1){
             //2nd kana wrong
             styleKana("previousKana", "currentKanaWrong");
             styleRomaji("romajiHide" ,"romajiWrong");
-            logOutput = "" + getAnswerLog().get(CURRENT_KANA - discardOffset).getKana() + " != " + input.replace(getAnswerLog().get(CURRENT_KANA).getRomanji(), "");
+            logOutput = "" + getAnswerLog().get(CURRENT_KANA - discardOffset).getKana() + " != " + input.replace(getAnswerLog().get(CURRENT_KANA).getRomaji(), "");
         } else /* if(discardOffset == -2) */ {
             System.out.println(
                 "Mate, something went wrong. We're in onWrong() and nothing is wrong… something is wrong!"
@@ -221,12 +225,15 @@ public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
         }
     }
 
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    /* Helper methods */
+
     /**
      * Helper method that {@return}s an int indicating which input(s) is/are wrong.
      */
     private int determineDiscardOffset() {
-        boolean correctStart = input.startsWith( getAnswerLog().get(CURRENT_KANA).getRomanji() );
-        boolean correctEnd = input.endsWith( getAnswerLog().get(CURRENT_KANA-1).getRomanji() );
+        boolean correctStart = input.startsWith( getAnswerLog().get(CURRENT_KANA).getRomaji() );
+        boolean correctEnd = input.endsWith( getAnswerLog().get(CURRENT_KANA-1).getRomaji() );
         int result;
         if(correctStart && correctEnd)              //fat fingering / extry chars inbetween 1st romaji and 2nd romaji
             result = -2;                            //0% happening (after the fat fingering check is included)
@@ -282,8 +289,8 @@ public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
          */
 
         /*
-        //boolean correctEnd = (input.length() > 1)? input.endsWith( getAnswerLog().get(CURRENT_KANA-1).getRomanji() ) : true;
-        //boolean correctEnd = (input.length() <= 1 || input.endsWith( getAnswerLog().get(CURRENT_KANA-1).getRomanji() ));
+        //boolean correctEnd = (input.length() > 1)? input.endsWith( getAnswerLog().get(CURRENT_KANA-1).getRomaji() ) : true;
+        //boolean correctEnd = (input.length() <= 1 || input.endsWith( getAnswerLog().get(CURRENT_KANA-1).getRomaji() ));
 
         if(correctStart && correctEnd)          //fat fingering, should not be happening (after the fat fingering check is included)
             result = -2;
@@ -295,7 +302,24 @@ public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
             result = -1;
         */
     }
+    /**
+     * Wrapper for readability.
+     * Checks whether or not {@param lead} and {@param post} can form a yoon
+     * and {@return}s it – or null otherwise.
+     */
+    private Yoon fetchYoon(Kana lead, Kana post) {
+        return Yoon.match(lead.getKana(), post.getKana());
+    }
+    /**
+     * Brevity wrapper that {@return}s the current yoons kana.
+     */
+    private String getYoonKana() {
+        return yoon.getKana(getAnswerLog().get(CURRENT_KANA).getKana());
+    }
 
+
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    /* Promises */
     //1st thing called in the parent constructor followed by initGUI()
     @Override protected void initFields() {
         question = new Label();
@@ -310,8 +334,7 @@ public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
         answerArea = new HBox();
         layout = new BorderPane();
     }
-
-    //2nd method called in the parent constructor followed by prepareFirstProblem()
+    //2nd method called in the parent constructor followed by applyCSS()
     @Override protected Region initGUI() {
         /* Question Area */
         question.setText("Type the romaji for…");
@@ -343,20 +366,20 @@ public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
 
         /* Answer Area */
 
-        answerInput.setOnKeyPressed( keyEvent -> handleInput(keyEvent) ); //IntelliJ will report that this can be replaced with a method reference - it can't, don't do it
+        answerInput.setOnKeyPressed( keyEvent -> handleInput(keyEvent) ); //don't listen to IntelliJ - handleInput() isn't static -> no method reference
         //answerInput.requestFocus(); //not needed, since we setFocusTraversable(false) on all other nodes
         answerArea.getChildren().addAll(answerInput);
         //answerArea.setPadding(new Insets(10.0f, 10.0f, 10.f, 10.f)); //doable in JFX CSS
 
-        layout = KanaGui.makeRegionSuitable(layout); //TODO remove dependancy on KanaGui
+        layout.setPrefSize(Options.WIDTH, Options.HEIGHT);
         layout.setTop(questionArea);
         layout.setCenter(answerArea);
 
         return layout;
     }
-
-    @Override protected void applyCSS() {
-        layout.getStylesheets().add(CSS_FILE_PATH);
+    //3rd method called in the parent constructor
+    @Override protected void applyCSS(String css_file_path) {
+        layout.getStylesheets().add(css_file_path);
         setCssClass(question, "question");
         setCssClass(previousKana, "previousKana");
         setCssClass(currentKana, "currentKana");
@@ -366,7 +389,6 @@ public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
         setCssClass(answerArea, "answerArea");
         setCssClass(answerInput, "answerInput");
     }
-
     //LAST method called in the parent constructor.
     @Override protected void prepareFirstProblem() {
         T dummy = super.randomAnswerFromOptions(getRecentlyUsedOptions());
@@ -377,7 +399,6 @@ public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
         setCssClass(previousKana, "previousKanaHide");
         setCssClass(previousRomaji, "romajiHide");
     }
-
     @Override protected void prepareNextProblem() {
         call_nextProblem = false;
         answerInput.clear();
@@ -395,41 +416,27 @@ public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
         previousKana.setText("" + getAnswerLog().get(2).getKana());
         currentKana.setText("" + getAnswerLog().get(1).getKana());
         upcomingKana.setText("" + getAnswerLog().get(0).getKana());
-        previousRomaji.setText(getAnswerLog().get(2).getRomanji());
-        currentRomaji.setText(getAnswerLog().get(1).getRomanji());
-        upcomingRomaji.setText(getAnswerLog().get(0).getRomanji());
+        previousRomaji.setText(getAnswerLog().get(2).getRomaji());
+        currentRomaji.setText(getAnswerLog().get(1).getRomaji());
+        upcomingRomaji.setText(getAnswerLog().get(0).getRomaji());
+    }
+    @Override public void onComplete() {
+
     }
 
+
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    /* Option wrapper */
     @Override protected int getAmount() {
-        return 3;
+        return Options.TypeRomaji.AMOUNT;
     }
-
-    //when we have less than 4 items
-    //the reason why we count to 4 and not 3 is because
-    //otherwise we might instantly get the newly discarded one back into the queue
-    //while stochastically unlikely, this could end in a prolonged phase of only seeing 3 Kana
-    //in the same sequence over and over again
-    //-> [a-b-c], discard c, draw c
-    //-> [c-a-b], discard b, draw b
-    //-> [b-c-a], discard a, draw a
-    //-> [a-b-c], discard c, draw c
-    // unique combinations: abc
-    //... ad infinitum...
-    //the worst case for size = 4 would be something like that
-    //where d = dummy / the invisible/unshown kana
-    //-> [a-b-c]-d, discard d, draw d
-    //-> [d-a-b]-c, discard c, draw c
-    //-> [c-d-a]-b, discard b, draw b
-    //-> [b-c-d]-a, discard a, draw a
-    //-> [a-b-c]-d, discard d, draw d
-    // unique combinations: abc, abd, acd, bcd;
-    //... ad infinitum...
     @Override protected int getRelevantLogDepth() {
-        return getAmount()+1;
+        return Options.TypeRomaji.DEPTH;
     }
 
-    /* CSS util methods */
 
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    /* CSS util methods */
     /**
      * Styles the previous kana its romaji according to {@param kanaCssStyle} and {@param romajiCssStyle}.
      */
@@ -437,7 +444,6 @@ public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
         styleKana(kanaCssStyle, "currentKana", "upcomingKana");
         styleRomaji(romajiCssStyle, "romajiHide", "romajiHide");
     }
-
     /**
      * Styles the previous & current kana according to {@param previousCssStyle} and {@param currentCssStyle}.
      * The upcoming kana will be styled with the default style.
@@ -445,7 +451,6 @@ public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
     private void styleKana(String previousCssStyle, String currentCssStyle) {
         styleKana(previousCssStyle, currentCssStyle, "upcomingKana");
     }
-
     /**
      * Styles the previous, currentCssStyle & upcomingCssStyle kana according to {@param previous}, {@param currentCssStyle} and {@param upcomingCssStyle}.
      */
@@ -454,17 +459,14 @@ public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
         setCssClass(currentKana, currentCssStyle);
         setCssClass(upcomingKana, upcomingCssStyle);
     }
-
     private void styleAllRomaji(String cssStyle) {
         styleRomaji(cssStyle, cssStyle, cssStyle);
     }
-
     private void styleRomaji(String previousCssStyle, String currentCssStyle) {
         styleRomaji(previousCssStyle, currentCssStyle, "romajiHide");
     }
-
     private void styleRomaji(String previousCssStyle, String currentCssStyle, String upcomingCssStyle) {
-        if(SHOW_ROMAJI) {
+        if(Options.SHOW_ROMAJI) {
             setCssClass(previousRomaji, (previousCssStyle.equals("romajiHide"))? "romaji" : previousCssStyle);
             setCssClass(currentRomaji, (currentCssStyle.equals("romajiHide"))? "romaji" : currentCssStyle);
             setCssClass(upcomingRomaji, (upcomingCssStyle.equals("romajiHide"))? "romaji" : upcomingCssStyle);
@@ -473,38 +475,5 @@ public class TypeTheRomaji<T extends Kana<T>> extends KanaExercise<T> {
             setCssClass(currentRomaji, currentCssStyle);
             setCssClass(upcomingRomaji, upcomingCssStyle);
         }
-    }
-
-    /**
-     * TODO Used in TypeTheRomaji.handleInput(KeyEvent ke): 1
-     */
-    private Yoon isYoon(Kana lead, Kana post) {
-        Yoon result = null;
-        if(lead instanceof Hiragana && post instanceof Hiragana) {
-            switch((Hiragana)lead) {
-                case KI:case GI:case SHI:case JI:case CHI:case DZI:case NI:case HI:case BI:case PI:case MI:case RI:
-                    break;
-                default: return null;
-            }
-            switch((Hiragana)post) {
-                case YA:case YU:case YO:
-                    break;
-                default: return null;
-            }
-            result = HiraganaYoon.match((Hiragana)lead, (Hiragana)post);
-        } else if(lead instanceof Katakana && post instanceof Katakana){
-            switch((Katakana)lead) {
-                case KI:case GI:case SHI:case JI:case CHI:case DZI:case NI:case HI:case BI:case PI:case MI:case RI:
-                    break;
-                default: return null;
-            }
-            switch((Katakana)post) {
-                case YA:case YU:case YO:
-                    break;
-                default: return null;
-            }
-            result = KatakanaYoon.match((Katakana)lead, (Katakana)post);
-        }
-        return result;
     }
 }

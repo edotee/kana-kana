@@ -1,4 +1,4 @@
-package gui.fxml;
+package moe.edotee.kanakana.gui.fxml;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import moe.edotee.kanakana.utils.Options;
 
 import java.io.IOException;
 
@@ -75,8 +76,6 @@ public class TestKanaGuiFXML extends Application {
      */
 
     private final static String TITLE = "Kana FXML Test GUI";
-    private final static double WIDTH = 854.0f;
-    private final static double HEIGHT = 480.0f;
 
     /* There should be no need to touch anything below this */
 
@@ -91,16 +90,16 @@ public class TestKanaGuiFXML extends Application {
     }
 
     private Scene loadScene(Parent root) {
-        scene = new Scene(root, WIDTH, HEIGHT);
+        scene = new Scene(root, Options.WIDTH, Options.HEIGHT);
         return scene;
     }
 
     private Parent loadStartLayout() throws IOException {
-        return FXMLLoader.load(getClass().getResource("fxml/startLayout.fxml"));
+        return FXMLLoader.load(getClass().getResource(Options.FXML.START));
     }
 
     private Parent loadExerciseLayout() throws IOException {
-        return FXMLLoader.load(getClass().getResource("fxml/exerciseLayout.fxml"));
+        return FXMLLoader.load(getClass().getResource(Options.FXML.EXERCISE));
     }
 
     public static void main(String[] args) { launch(args); }

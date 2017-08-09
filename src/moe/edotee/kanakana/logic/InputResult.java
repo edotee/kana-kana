@@ -1,4 +1,4 @@
-package logic;
+package moe.edotee.kanakana.logic;
 
 /**
  * @author edotee

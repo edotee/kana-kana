@@ -1,10 +1,8 @@
-package logic;
+package moe.edotee.kanakana.logic;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.layout.Region;
-import kana.Kana;
+import moe.edotee.kanakana.kana.Kana;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,18 +12,19 @@ import java.util.Random;
  * Since any relevant method is called before the JVM
  * returns to the child's constructor block, it is recommended
  * to only invoke super() in it.
- * The parent constructor automatically calls initFields()
- * before initGui() and prepareFirstProblem().
+ * The parent constructor automatically calls
+ * 1) initFields()
+ * 2) initGui()
+ * 3) applyCSS()
+ * last) prepareFirstProblem().
  * If fields have to be initialized, do so in the initFields() method.
  *
  * @author edotee
  */
-public abstract class KanaExercise<T extends Kana<T>> {
+public abstract class KanaExercise<T extends Kana> {
 
-    private final ArrayList<T> completeList;            //The general pool of kana that will be tested
     private final HashSet<T> targetKana;                //The general pool of kana that will be tested
     private final ArrayList<T> targetKanaAsArrayList;   //The general pool of kana that will be tested
-    private final EventHandler<ActionEvent> onComplete;
     private final Region gui;
 
     private Random rng;
@@ -35,36 +34,39 @@ public abstract class KanaExercise<T extends Kana<T>> {
     //TODO if needed, add the utility method getRecent() which will return the an unmutable subset of answerLog to exclude from getting chosen for answer picking
     private ArrayList<T> answerOptions;     //Pool of currently used kana
 
-    public KanaExercise(ArrayList<T> completeList, HashSet<T> targetKana,
-                        EventHandler<ActionEvent> onComplete) {
-        this.completeList = completeList;
+    public KanaExercise(HashSet<T> targetKana, String cssPath) {
         this.targetKana = targetKana;
         targetKanaAsArrayList = new ArrayList<T>(targetKana);
-        this.onComplete = onComplete;
 
         rng = new Random(System.currentTimeMillis());
         initFields();
         gui = initGUI();
-        applyCSS();
+        applyCSS(cssPath);
         answerLog = new ArrayList<>();
         answerOptions = new ArrayList<>();
         firstProblem();
     }
 
-    /* Abstract Methods */
 
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    /* Abstract Methods */
     protected abstract void initFields();
     protected abstract Region initGUI();
-    protected abstract void applyCSS();
+    protected abstract void applyCSS(String css_file_path);
 
     protected abstract void prepareFirstProblem();
     protected abstract void prepareNextProblem();
+    public abstract void onComplete();
 
+
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    /* Option wrapper */
     protected abstract int getAmount();
     protected abstract int getRelevantLogDepth();
 
-    /* Methods for external Logics */
 
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    /* Methods for external Logics */
     private void firstProblem() {
         pickMyOwnAnswers();
         prepareFirstProblem();
@@ -74,8 +76,9 @@ public abstract class KanaExercise<T extends Kana<T>> {
         prepareNextProblem();
     }
 
-    /* Helper Methods */
 
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    /* Helper Methods */
     /**
      * Not sure if redundant or not - better have a little redundancy than having to deal with unknotting a nightmare later
      */
@@ -194,18 +197,15 @@ public abstract class KanaExercise<T extends Kana<T>> {
         return magicShapedBlock;
     }
 
-    /* Getter */
 
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    /* Getter */
     public HashSet<T> getTargetKana() {
         return targetKana;
     }
 
     public ArrayList<T> getTargetKanaAsArrayList() {
         return targetKanaAsArrayList;
-    }
-
-    public EventHandler<ActionEvent> getOnComplete() {
-        return onComplete;
     }
 
     public Region getGui() {

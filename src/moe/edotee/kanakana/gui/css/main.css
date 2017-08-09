@@ -1,0 +1,11 @@
+.buttonBar{
+    -fx-alignment: center;
+    -fx-spacing: 10;
+    -fx-background-color: green;
+}
+
+.kanaPickerButton{
+    -fx-font: 36 arial;
+    -fx-background-radius: 0;
+    -fx-text-fill: green;
+}

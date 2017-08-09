@@ -2,7 +2,7 @@
 <?import javafx.scene.control.Button?>
 
 <GridPane xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="10" vgap="10"
-          fx:controller="gui.fxml.TestKanaGuiFXML">
+          fx:controller="moe.edotee.kanakana.gui.fxml.TestKanaGuiFXML">
 
     <Button text="Back to the Start" fx:id="switchToStartLayoutButton" onAction="#onSwitchToStartLayoutButtonClick"/>
 </GridPane>

@@ -1,8 +1,5 @@
-package logic;
+package moe.edotee.kanakana.logic;
 
-import gui.KanaGui;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
@@ -10,17 +7,16 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import kana.Kana;
 
-import java.util.ArrayList;
+import moe.edotee.kanakana.kana.Kana;
+import moe.edotee.kanakana.utils.Options;
+
 import java.util.HashSet;
 
 /**
  * @author edotee
  */
-public class PickTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
-
-    private final String CSS_FILE_PATH = "gui/css/pick_the_right_romaji.css";
+public class PickTheKana<T extends Kana> extends KanaExercise<T> {
 
     private BorderPane layout;
     private Label question, inQuestion;
@@ -30,9 +26,8 @@ public class PickTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
 
     private int rightAnswer;
 
-    public PickTheRightKana(ArrayList<T> completeList, HashSet<T> targetKana,
-                            EventHandler<ActionEvent> onComplete) {
-        super(completeList, targetKana, onComplete);
+    public PickTheKana(HashSet<T> targetKana, String cssPath) {
+        super(targetKana, cssPath);
     }
 
     private void onCorrect() {
@@ -65,8 +60,8 @@ public class PickTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
         populateButtonPool();
 
         /* Layout */
-        layout = KanaGui.makeRegionSuitable(layout);
-        layout.setOnKeyPressed(ke -> handleKeyboardInput(ke));
+        layout.setPrefSize(Options.WIDTH, Options.HEIGHT);
+        layout.setOnKeyPressed(ke -> handleKeyboardInput(ke));  // don't listen to IntelliJ - handleKeyboardInput() isn't static -> no method reference
         layout.setTop(questionArea);
         layout.setCenter(answerArea);
 
@@ -81,8 +76,8 @@ public class PickTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
         }
     }
 
-    @Override protected void applyCSS() {
-        layout.getStylesheets().add(CSS_FILE_PATH);
+    @Override protected void applyCSS(String css_file_path) {
+        layout.getStylesheets().add(css_file_path);
         setCssClass(question, "question");
         setCssClass(inQuestion, "inQuestion");
         setCssClass(questionArea, "questionArea");
@@ -133,7 +128,7 @@ public class PickTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
         while(getAnswerLog().size() > 10)
             getAnswerLog().remove(10);
 
-        inQuestion.setText("" + getAnswerLog().get(rightAnswer).getRomanji());
+        inQuestion.setText("" + getAnswerLog().get(rightAnswer).getRomaji());
         for(int myKana = 0; myKana < getAmount(); myKana++) {
             buttonPool[myKana].setText("" + getAnswerLog().get(myKana).getKana());
             buttonPool[myKana].setOnAction( (myKana == rightAnswer)? e -> onCorrect() : e -> onWrong() );
@@ -141,11 +136,15 @@ public class PickTheRightKana<T extends Kana<T>> extends KanaExercise<T> {
         }
     }
 
+    @Override public void onComplete() {
+
+    }
+
     @Override protected int getAmount() {
-        return 5;
+        return Options.PickKana.AMOUNT;
     }
 
     @Override protected int getRelevantLogDepth() {
-        return 3;
+        return Options.PickKana.DEPTH;
     }
 }
