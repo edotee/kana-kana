@@ -70,18 +70,18 @@
     -fx-text-fill: gold;
 }
 
-.currentKanaWrong{
-    -fx-alignment: center;
-    -fx-font: 70 arial;
-    -fx-text-alignment: center;
-    -fx-text-fill: red;
-}
-
 .currentKanaFoul{
     -fx-alignment: center;
     -fx-font: 70 arial;
     -fx-text-alignment: center;
     -fx-text-fill: yellowgreen;
+}
+
+.currentKanaWrong{
+    -fx-alignment: center;
+    -fx-font: 70 arial;
+    -fx-text-alignment: center;
+    -fx-text-fill: red;
 }
 
 .upcomingKana{

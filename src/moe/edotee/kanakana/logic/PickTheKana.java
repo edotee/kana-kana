@@ -9,6 +9,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import moe.edotee.kanakana.kana.Kana;
+import moe.edotee.kanakana.utils.CSS;
 import moe.edotee.kanakana.utils.Options;
 
 import java.util.HashSet;
@@ -72,16 +73,16 @@ public class PickTheKana<T extends Kana> extends KanaExercise<T> {
         for(int i = 0; i < getAmount(); i++) {
             buttonPool[i] = new Button();
             answerArea.getChildren().add( buttonPool[i] );
-            setCssClass(buttonPool[i], "buttonPoolButton");
+            CSS.style(buttonPool[i], CSS.pickKana.buttonPoolButton);
         }
     }
 
     @Override protected void applyCSS(String css_file_path) {
         layout.getStylesheets().add(css_file_path);
-        setCssClass(question, "question");
-        setCssClass(inQuestion, "inQuestion");
-        setCssClass(questionArea, "questionArea");
-        setCssClass(answerArea, "answerArea");
+        CSS.style(question, CSS.pickKana.question);
+        CSS.style(inQuestion, CSS.pickKana.inQuestion);
+        CSS.style(questionArea, CSS.pickKana.questionArea);
+        CSS.style(answerArea, CSS.pickKana.answerArea);
     }
 
     private void handleKeyboardInput(KeyEvent ke) {

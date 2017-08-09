@@ -13,9 +13,12 @@ import javafx.scene.layout.Priority;
 
 import moe.edotee.kanakana.kana.Kana;
 import moe.edotee.kanakana.kana.Yoon;
+import moe.edotee.kanakana.utils.CSS;
 import moe.edotee.kanakana.utils.Options;
 
 import java.util.HashSet;
+
+import static moe.edotee.kanakana.utils.CSS.typeRomaji.*;
 
 /**
  * @author edotee
@@ -25,10 +28,10 @@ public class TypeTheRomaji<T extends Kana> extends KanaExercise<T> {
     private final int CURRENT_KANA = 1;
 
     private BorderPane layout;
-    private Label question, currentKana, previousKana, upcomingKana, previousRomaji, currentRomaji, upcomingRomaji;
-    private VBox questionArea;
-    private TextField answerInput;
-    private HBox answerArea;
+    private Label questionlbl, currentKanalbl, previousKanalbl, upcomingKanalbl, previousRomajilbl, currentRomajilbl, upcomingRomajilbl;
+    private VBox questionAreaNode;
+    private TextField answerInputNode;
+    private HBox answerAreaNode;
 
     /* We initiated the following fields to avoid unnecessary GC work, since they'll be (in)directly used in each pass of handleInput() */
     //input, yoon and resultCase are used in handleInput
@@ -72,8 +75,8 @@ public class TypeTheRomaji<T extends Kana> extends KanaExercise<T> {
             //TODO add some smart regex to sort handle / potato finger inputs (double consonants, ending with a consonant other than n, not ending on a vowel (excluding n)
             //split input at each vowel(a,i,u,e,o) and at each n that is followed by a non-vowel / consonant or ' -> enka -> e nka _> e n ka
             //nana -> na na | nan'a -> na n'a -> na n a
-            input = answerInput.getText().toLowerCase().replace(" ", "");
-            answerInput.setText(input);
+            input = answerInputNode.getText().toLowerCase().replace(" ", "");
+            answerInputNode.setText(input);
             yoon = fetchYoon(getAnswerLog().get(CURRENT_KANA), getAnswerLog().get(CURRENT_KANA-1));
             resultCase = evaluateInput();
             logOutput = "";
@@ -100,10 +103,10 @@ public class TypeTheRomaji<T extends Kana> extends KanaExercise<T> {
             if(logOutput.length() > 0) System.out.println(logOutput);
         }
         if(keyEvent.getCode() == KeyCode.SPACE) {
-            answerInput.clear();
+            answerInputNode.clear();
         }
         /*if(keyEvent.getCode().equals(KeyCode.BACK_SPACE)) {
-            answerInput.clear();
+            answerInputNode.clear();
         }*/
     }
 
@@ -147,7 +150,7 @@ public class TypeTheRomaji<T extends Kana> extends KanaExercise<T> {
      * according to the results from {@link #evaluateInput() evaluateInput()}.
      */
     private void onCorrect() {
-        stylePrevious("previousKana", "romajiHide");
+        stylePrevious(previousKana, romajiHide);
         //logOutput = "Correct!"
     }
 
@@ -156,8 +159,8 @@ public class TypeTheRomaji<T extends Kana> extends KanaExercise<T> {
      * according to the results from {@link #evaluateInput() evaluateInput()}.
      */
     private void onDoubleCorrect() {
-        styleKana("previousKanaDouble", "currentKanaDouble");
-        styleAllRomaji("romajiHide");
+        styleKana(previousKanaDouble, currentKanaDouble);
+        styleAllRomaji(romajiHide);
         //logOutput = "Double!";
     }
 
@@ -166,11 +169,11 @@ public class TypeTheRomaji<T extends Kana> extends KanaExercise<T> {
      * according to the results from {@link #evaluateInput() evaluateInput()}.
      */
     private void onYoon() {
-        styleKana("previousKanaYoon", "currentKanaYoon");
-        styleRomaji("romajiYoon", "romajiYoon", "romajiHide");
+        styleKana(previousKanaYoon, currentKanaYoon);
+        styleRomaji(romajiYoon, romajiYoon, romajiHide);
         nextProblem();
-        previousKana.setText(getYoonKana());
-        previousRomaji.setText(input); //or input
+        previousKanalbl.setText(getYoonKana());
+        previousRomajilbl.setText(input); //or input
         logOutput = "Yoon! – " + getYoonKana() + " ~ " + input;
         //discardOffset = 1;
     }
@@ -180,7 +183,7 @@ public class TypeTheRomaji<T extends Kana> extends KanaExercise<T> {
      * according to the results from {@link #evaluateInput() evaluateInput()}.
      */
     private void onMissedYoon() {
-        stylePrevious("previousKanaMissedYoon", "romajiMissedYoon");
+        stylePrevious(previousKanaMissedYoon, romajiMissedYoon);
         logOutput = "Missed a Yoon! – " + getYoonKana() + " ~ " + yoon.getRomaji();
     }
 
@@ -189,8 +192,8 @@ public class TypeTheRomaji<T extends Kana> extends KanaExercise<T> {
      * according to the results from {@link #evaluateInput() evaluateInput()}.
      */
     private void onFoul() {
-        styleKana("previousKanaFoul", "currentKanaFoul");
-        styleAllRomaji("romajiHide");
+        styleKana(previousKanaFoul, currentKanaFoul);
+        styleAllRomaji(romajiHide);
         logOutput = "FOUL: を is only used as a particle";
         discardOffset = determineDiscardOffset();   //TODO replace with checkFoul()
     }
@@ -203,20 +206,20 @@ public class TypeTheRomaji<T extends Kana> extends KanaExercise<T> {
         discardOffset = determineDiscardOffset();
         if(discardOffset == -1) {
             //every kana wrong
-            styleKana("previousKanaWrong", "currentKanaWrong");
-            styleRomaji("romajiWrong", "romajiWrong");
+            styleKana(previousKanaWrong, currentKanaWrong);
+            styleRomaji(romajiWrong, romajiWrong);
             logOutput = "" + getAnswerLog().get(CURRENT_KANA).getKana() + "|" + getAnswerLog().get(CURRENT_KANA - 1).getKana() + " != " + input;
         }
         else if(discardOffset == 0) {
             //1st kana wrong
-            styleKana("previousKanaWrong", "currentKana");
-            styleRomaji("romajiWrong", "romajiHide");
+            styleKana(previousKanaWrong, currentKana);
+            styleRomaji(romajiWrong, romajiHide);
             logOutput = "" + getAnswerLog().get(CURRENT_KANA).getKana() + " != " + input.replace(getAnswerLog().get(CURRENT_KANA - 1).getRomaji(), "");
         }
         else if(discardOffset == 1){
             //2nd kana wrong
-            styleKana("previousKana", "currentKanaWrong");
-            styleRomaji("romajiHide" ,"romajiWrong");
+            styleKana(previousKana, currentKanaWrong);
+            styleRomaji(romajiHide, romajiWrong);
             logOutput = "" + getAnswerLog().get(CURRENT_KANA - discardOffset).getKana() + " != " + input.replace(getAnswerLog().get(CURRENT_KANA).getRomaji(), "");
         } else /* if(discardOffset == -2) */ {
             System.out.println(
@@ -322,72 +325,72 @@ public class TypeTheRomaji<T extends Kana> extends KanaExercise<T> {
     /* Promises */
     //1st thing called in the parent constructor followed by initGUI()
     @Override protected void initFields() {
-        question = new Label();
-        previousKana = new Label();
-        currentKana = new Label();
-        upcomingKana = new Label();
-        previousRomaji = new Label();
-        currentRomaji = new Label();
-        upcomingRomaji = new Label();
-        questionArea = new VBox();
-        answerInput = new TextField();
-        answerArea = new HBox();
+        questionlbl = new Label();
+        previousKanalbl = new Label();
+        currentKanalbl = new Label();
+        upcomingKanalbl = new Label();
+        previousRomajilbl = new Label();
+        currentRomajilbl = new Label();
+        upcomingRomajilbl = new Label();
+        questionAreaNode = new VBox();
+        answerInputNode = new TextField();
+        answerAreaNode = new HBox();
         layout = new BorderPane();
     }
     //2nd method called in the parent constructor followed by applyCSS()
     @Override protected Region initGUI() {
         /* Question Area */
-        question.setText("Type the romaji for…");
+        questionlbl.setText("Type the romaji for…");
 
         /* Size is currently not supported by JavaFX */
-        previousKana.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        currentKana.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        upcomingKana.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        previousRomaji.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        currentRomaji.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        upcomingRomaji.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        previousKanalbl.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        currentKanalbl.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        upcomingKanalbl.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        previousRomajilbl.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        currentRomajilbl.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        upcomingRomajilbl.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         GridPane problemBar = new GridPane();
-        GridPane.setHgrow(previousKana, Priority.ALWAYS);
-        GridPane.setHgrow(currentKana, Priority.ALWAYS);
-        GridPane.setHgrow(upcomingKana, Priority.ALWAYS);
-        GridPane.setHgrow(previousRomaji, Priority.ALWAYS);
-        GridPane.setHgrow(currentRomaji, Priority.ALWAYS);
-        GridPane.setHgrow(upcomingRomaji, Priority.ALWAYS);
-        GridPane.setConstraints(previousKana, 0, 0);
-        GridPane.setConstraints(currentKana, 1, 0);
-        GridPane.setConstraints(upcomingKana, 2, 0);
-        GridPane.setConstraints(previousRomaji, 0, 1);
-        GridPane.setConstraints(currentRomaji, 1, 1);
-        GridPane.setConstraints(upcomingRomaji, 2, 1);
-        problemBar.getChildren().addAll(previousKana, currentKana, upcomingKana, previousRomaji,  currentRomaji, upcomingRomaji);
+        GridPane.setHgrow(previousKanalbl, Priority.ALWAYS);
+        GridPane.setHgrow(currentKanalbl, Priority.ALWAYS);
+        GridPane.setHgrow(upcomingKanalbl, Priority.ALWAYS);
+        GridPane.setHgrow(previousRomajilbl, Priority.ALWAYS);
+        GridPane.setHgrow(currentRomajilbl, Priority.ALWAYS);
+        GridPane.setHgrow(upcomingRomajilbl, Priority.ALWAYS);
+        GridPane.setConstraints(previousKanalbl, 0, 0);
+        GridPane.setConstraints(currentKanalbl, 1, 0);
+        GridPane.setConstraints(upcomingKanalbl, 2, 0);
+        GridPane.setConstraints(previousRomajilbl, 0, 1);
+        GridPane.setConstraints(currentRomajilbl, 1, 1);
+        GridPane.setConstraints(upcomingRomajilbl, 2, 1);
+        problemBar.getChildren().addAll(previousKanalbl, currentKanalbl, upcomingKanalbl, previousRomajilbl, currentRomajilbl, upcomingRomajilbl);
 
-        questionArea.getChildren().addAll(question, problemBar);
+        questionAreaNode.getChildren().addAll(questionlbl, problemBar);
 
         /* Answer Area */
 
-        answerInput.setOnKeyPressed( keyEvent -> handleInput(keyEvent) ); //don't listen to IntelliJ - handleInput() isn't static -> no method reference
-        //answerInput.requestFocus(); //not needed, since we setFocusTraversable(false) on all other nodes
-        answerArea.getChildren().addAll(answerInput);
-        //answerArea.setPadding(new Insets(10.0f, 10.0f, 10.f, 10.f)); //doable in JFX CSS
+        answerInputNode.setOnKeyPressed(keyEvent -> handleInput(keyEvent) ); //don't listen to IntelliJ - handleInput() isn't static -> no method reference
+        //answerInputNode.requestFocus(); //not needed, since we setFocusTraversable(false) on all other nodes
+        answerAreaNode.getChildren().addAll(answerInputNode);
+        //answerAreaNode.setPadding(new Insets(10.0f, 10.0f, 10.f, 10.f)); //doable in JFX CSS
 
         layout.setPrefSize(Options.WIDTH, Options.HEIGHT);
-        layout.setTop(questionArea);
-        layout.setCenter(answerArea);
+        layout.setTop(questionAreaNode);
+        layout.setCenter(answerAreaNode);
 
         return layout;
     }
     //3rd method called in the parent constructor
     @Override protected void applyCSS(String css_file_path) {
         layout.getStylesheets().add(css_file_path);
-        setCssClass(question, "question");
-        setCssClass(previousKana, "previousKana");
-        setCssClass(currentKana, "currentKana");
-        setCssClass(upcomingKana, "upcomingKana");
-        styleAllRomaji("romajiHide");
-        setCssClass(questionArea, "questionArea");
-        setCssClass(answerArea, "answerArea");
-        setCssClass(answerInput, "answerInput");
+        CSS.style(questionlbl, question);
+        CSS.style(previousKanalbl, previousKana);
+        CSS.style(currentKanalbl, currentKana);
+        CSS.style(upcomingKanalbl, upcomingKana);
+        styleAllRomaji(romajiHide);
+        CSS.style(questionAreaNode, questionArea);
+        CSS.style(answerAreaNode, answerArea);
+        CSS.style(answerInputNode, answerInput);
     }
     //LAST method called in the parent constructor.
     @Override protected void prepareFirstProblem() {
@@ -395,13 +398,13 @@ public class TypeTheRomaji<T extends Kana> extends KanaExercise<T> {
         getAnswerLog().add(dummy);   //we add the 1st Kana 2 times, because 1 will be a dummy
         getAnswerLog().add(dummy);   //not doing this would increase the number of Kanas to be excluded
         prepareNextProblem();   //we only exclude Kana that we already have tested
-        styleAllRomaji("romajiHide");
-        setCssClass(previousKana, "previousKanaHide");
-        setCssClass(previousRomaji, "romajiHide");
+        styleAllRomaji(romajiHide);
+        CSS.style(previousKanalbl, previousKanaHide);
+        CSS.style(previousRomajilbl, romajiHide);
     }
     @Override protected void prepareNextProblem() {
         call_nextProblem = false;
-        answerInput.clear();
+        answerInputNode.clear();
         //+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~
         /* discard the mistyped kana and not the current one
         if(discardOffset > 0) {
@@ -413,12 +416,12 @@ public class TypeTheRomaji<T extends Kana> extends KanaExercise<T> {
         //+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~
         getAnswerLog().add(0, randomAnswerFromOptions(getRecentlyUsedOptions()));
         //0 = next kana; 1 = current kana; 2 = previous kana
-        previousKana.setText("" + getAnswerLog().get(2).getKana());
-        currentKana.setText("" + getAnswerLog().get(1).getKana());
-        upcomingKana.setText("" + getAnswerLog().get(0).getKana());
-        previousRomaji.setText(getAnswerLog().get(2).getRomaji());
-        currentRomaji.setText(getAnswerLog().get(1).getRomaji());
-        upcomingRomaji.setText(getAnswerLog().get(0).getRomaji());
+        previousKanalbl.setText("" + getAnswerLog().get(2).getKana());
+        currentKanalbl.setText("" + getAnswerLog().get(1).getKana());
+        upcomingKanalbl.setText("" + getAnswerLog().get(0).getKana());
+        previousRomajilbl.setText(getAnswerLog().get(2).getRomaji());
+        currentRomajilbl.setText(getAnswerLog().get(1).getRomaji());
+        upcomingRomajilbl.setText(getAnswerLog().get(0).getRomaji());
     }
     @Override public void onComplete() {
 
@@ -440,40 +443,40 @@ public class TypeTheRomaji<T extends Kana> extends KanaExercise<T> {
     /**
      * Styles the previous kana its romaji according to {@param kanaCssStyle} and {@param romajiCssStyle}.
      */
-    private void stylePrevious(String kanaCssStyle, String romajiCssStyle) {
-        styleKana(kanaCssStyle, "currentKana", "upcomingKana");
-        styleRomaji(romajiCssStyle, "romajiHide", "romajiHide");
+    private void stylePrevious(CSS kanaCssStyle, CSS romajiCssStyle) {
+        styleKana(kanaCssStyle, currentKana, upcomingKana);
+        styleRomaji(romajiCssStyle, romajiHide, romajiHide);
     }
     /**
      * Styles the previous & current kana according to {@param previousCssStyle} and {@param currentCssStyle}.
      * The upcoming kana will be styled with the default style.
      */
-    private void styleKana(String previousCssStyle, String currentCssStyle) {
-        styleKana(previousCssStyle, currentCssStyle, "upcomingKana");
+    private void styleKana(CSS previousCssStyle, CSS currentCssStyle) {
+        styleKana(previousCssStyle, currentCssStyle, upcomingKana);
     }
     /**
      * Styles the previous, currentCssStyle & upcomingCssStyle kana according to {@param previous}, {@param currentCssStyle} and {@param upcomingCssStyle}.
      */
-    private void styleKana(String previous, String currentCssStyle, String upcomingCssStyle) {
-        setCssClass(previousKana, previous);
-        setCssClass(currentKana, currentCssStyle);
-        setCssClass(upcomingKana, upcomingCssStyle);
+    private void styleKana(CSS previous, CSS currentCssStyle, CSS upcomingCssStyle) {
+        CSS.style(previousKanalbl, previous);
+        CSS.style(currentKanalbl, currentCssStyle);
+        CSS.style(upcomingKanalbl, upcomingCssStyle);
     }
-    private void styleAllRomaji(String cssStyle) {
+    private void styleAllRomaji(CSS cssStyle) {
         styleRomaji(cssStyle, cssStyle, cssStyle);
     }
-    private void styleRomaji(String previousCssStyle, String currentCssStyle) {
-        styleRomaji(previousCssStyle, currentCssStyle, "romajiHide");
+    private void styleRomaji(CSS previousCssStyle, CSS currentCssStyle) {
+        styleRomaji(previousCssStyle, currentCssStyle, romajiHide);
     }
-    private void styleRomaji(String previousCssStyle, String currentCssStyle, String upcomingCssStyle) {
+    private void styleRomaji(CSS previousCssStyle, CSS currentCssStyle, CSS upcomingCssStyle) {
         if(Options.SHOW_ROMAJI) {
-            setCssClass(previousRomaji, (previousCssStyle.equals("romajiHide"))? "romaji" : previousCssStyle);
-            setCssClass(currentRomaji, (currentCssStyle.equals("romajiHide"))? "romaji" : currentCssStyle);
-            setCssClass(upcomingRomaji, (upcomingCssStyle.equals("romajiHide"))? "romaji" : upcomingCssStyle);
+            CSS.style(previousRomajilbl, (previousCssStyle == romajiHide)? romaji : previousCssStyle);
+            CSS.style(currentRomajilbl, (currentCssStyle == romajiHide)? romaji : currentCssStyle);
+            CSS.style(upcomingRomajilbl, (upcomingCssStyle == romajiHide)? romaji : upcomingCssStyle);
         } else {
-            setCssClass(previousRomaji, previousCssStyle);
-            setCssClass(currentRomaji, currentCssStyle);
-            setCssClass(upcomingRomaji, upcomingCssStyle);
+            CSS.style(previousRomajilbl, previousCssStyle);
+            CSS.style(currentRomajilbl, currentCssStyle);
+            CSS.style(upcomingRomajilbl, upcomingCssStyle);
         }
     }
 }

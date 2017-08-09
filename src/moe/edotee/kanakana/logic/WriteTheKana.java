@@ -8,6 +8,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import moe.edotee.kanakana.kana.Kana;
+import moe.edotee.kanakana.utils.CSS;
 import moe.edotee.kanakana.utils.Options;
 
 import java.util.HashSet;
@@ -55,7 +56,7 @@ public class WriteTheKana<T extends Kana> extends KanaExercise<T> {
     private void populateLabelPool() {
         for(int i = 0; i < getAmount(); i++) {
             Button button = new Button(); Label label = new Label();
-            button.setOnAction( e -> setCssClass(label, "labelPoolLabel") );
+            button.setOnAction( e -> CSS.style(label, CSS.writeKana.labelPoolLabel) );
             GridPane.setConstraints(button, i, 0);
             GridPane.setConstraints(label, i, 1);
 
@@ -71,15 +72,15 @@ public class WriteTheKana<T extends Kana> extends KanaExercise<T> {
             answerArea.getChildren().addAll( button, label );
 
             /* styling */
-            setCssClass(button, "buttonPoolButton");
+            CSS.style(button, CSS.writeKana.buttonPoolButton); //TODO check if redundant
         }
     }
 
     @Override protected void applyCSS(String css_file_path) {
         layout.getStylesheets().add(css_file_path);
-        setCssClass(answerArea, "answerArea");
-        setCssClass(question, "question");
-        setCssClass(questionArea, "questionArea");
+        CSS.style(answerArea, CSS.writeKana.answerArea);
+        CSS.style(question, CSS.writeKana.question);
+        CSS.style(questionArea, CSS.writeKana.questionArea);
     }
 
     @Override protected void prepareFirstProblem() {
@@ -90,7 +91,7 @@ public class WriteTheKana<T extends Kana> extends KanaExercise<T> {
         for(int i = 0; i < getAmount(); i++) {
             buttonPool[i].setText("" + getCurrentAnswerOptions().get(i).getRomaji());
             labelPool[i].setText("" + getCurrentAnswerOptions().get(i).getKana());
-            setCssClass(labelPool[i], "labelPoolLabelHide");
+            CSS.style(labelPool[i], CSS.writeKana.labelPoolLabelHide);
         }
         getAnswerLog().addAll(0, getCurrentAnswerOptions());
     }

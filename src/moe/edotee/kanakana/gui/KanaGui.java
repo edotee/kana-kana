@@ -14,6 +14,7 @@ import moe.edotee.kanakana.gui.elements.KanaPicker;
 import moe.edotee.kanakana.kana.Kana.Hiragana;
 import moe.edotee.kanakana.kana.Kana.Katakana;
 import moe.edotee.kanakana.logic.KanaExercise;
+import moe.edotee.kanakana.utils.CSS;
 import moe.edotee.kanakana.utils.Options;
 
 import java.util.*;
@@ -85,7 +86,7 @@ public class KanaGui extends Application {
 
         HBox bottomNode = new HBox();
         bottomNode.getChildren().add(startButton);
-        bottomNode.getStyleClass().add("buttonBar");
+        CSS.style(bottomNode, CSS.main.buttonBar);
         return bottomNode;
     }
     private Node createButtonBarExercise() {
@@ -102,7 +103,7 @@ public class KanaGui extends Application {
 
         HBox buttonBox = new HBox();
         buttonBox.getChildren().addAll(goToNextProblem, goToNextExercise, exitExercise);
-        buttonBox.getStyleClass().add("buttonBar");
+        CSS.style(buttonBox, CSS.main.buttonBar);
         return  buttonBox;
     }
 
@@ -133,6 +134,7 @@ public class KanaGui extends Application {
             exerciseLayout.setCenter(currentExercise.getGui());
             scene.setRoot(exerciseLayout);
         } else {
+            System.out.println("No exercise left.");
             scene.setRoot(startLayout);
         }
     }   // called by startExercises() & the [next] button

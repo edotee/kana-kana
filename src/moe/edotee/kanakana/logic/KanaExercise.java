@@ -88,14 +88,6 @@ public abstract class KanaExercise<T extends Kana> {
     }
 
     /**
-     * Helper method for CSS stuff
-     */
-    protected void setCssClass(Node node, String newStyleClass) {
-        node.getStyleClass().clear();
-        node.getStyleClass().add(newStyleClass);
-    }
-
-    /**
      * Picks getAmount() options from targetKana, which was passed at instance initiation
      * 1) Create an ArrayList with targetKana
      * 2) Remove all recently used kana from it (for more consistent testing)

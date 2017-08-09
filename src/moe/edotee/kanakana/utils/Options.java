@@ -1,6 +1,7 @@
 package moe.edotee.kanakana.utils;
 
 /**
+ * Holds options / configurations / constants.
  * @author edotee
  */
 public interface Options {
@@ -18,7 +19,7 @@ public interface Options {
     interface CSS {
         String Main = "moe/edotee/kanakana/gui/css/main.css";
         String PickKana = "moe/edotee/kanakana/gui/css/pick_the_kana.css";
-        String TypeKana = "moe/edotee/kanakana/gui/css/type_the_romaji.css";
+        String TypeRomaji = "moe/edotee/kanakana/gui/css/type_the_romaji.css";
         String WriteKana = "moe/edotee/kanakana/gui/css/write_the_kana.css";
     }
 

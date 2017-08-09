@@ -9,6 +9,7 @@ import javafx.scene.layout.GridPane;
 import moe.edotee.kanakana.kana.Kana;
 import moe.edotee.kanakana.kana.Kana.Hiragana;
 import moe.edotee.kanakana.kana.Romaji;
+import moe.edotee.kanakana.utils.CSS;
 import moe.edotee.kanakana.utils.Options;
 
 import java.util.HashMap;
@@ -39,13 +40,13 @@ public class KanaPicker<T extends Kana> extends Tab {
         int xCord = 0;
         int yCord = 0;
         Romaji romaji;
+        ToggleButton button;
         for(; yCord < romajiGrid.length; yCord++) {
             for(; xCord < romajiGrid[0].length; xCord++) {
                 romaji = romajiGrid[yCord][xCord];
                 if(romaji != null) {
                     T kana = Kana.getKana(romaji, tokenKana);
-                    ToggleButton button = new ToggleButton(""+kana.getKana());
-                    button.getStyleClass().add("kanaPickerButton");
+                    button = CSS.style(new ToggleButton(""+kana.getKana()), CSS.main.kanaPickerButton, false);
                     buttonPool.put(button, kana);
 
                     for(String r : ((tokenKana instanceof Hiragana)? Options.Default.dHiragana : Options.Default.dKatakana)) {

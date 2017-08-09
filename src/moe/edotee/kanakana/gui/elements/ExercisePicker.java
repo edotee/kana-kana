@@ -76,8 +76,8 @@ public class ExercisePicker extends Tab {
         ArrayList<KanaExercise> exerciseList = new ArrayList<>();
         if(pickHiragana.isSelected()) exerciseList.add(new PickTheKana<>(pickedHiragana, Options.CSS.PickKana));
         if(pickKatakana.isSelected()) exerciseList.add(new PickTheKana<>(pickedKatakana, Options.CSS.PickKana));
-        if(typeHiragana.isSelected()) exerciseList.add(new TypeTheRomaji<>( pickedHiragana, Options.CSS.TypeKana));
-        if(typeKatakana.isSelected()) exerciseList.add(new TypeTheRomaji<>( pickedKatakana, Options.CSS.TypeKana));
+        if(typeHiragana.isSelected()) exerciseList.add(new TypeTheRomaji<>( pickedHiragana, Options.CSS.TypeRomaji));
+        if(typeKatakana.isSelected()) exerciseList.add(new TypeTheRomaji<>( pickedKatakana, Options.CSS.TypeRomaji));
         if(writeHiragana.isSelected()) exerciseList.add(new WriteTheKana<>( pickedHiragana, Options.CSS.WriteKana));
         if(writeKatakana.isSelected()) exerciseList.add(new WriteTheKana<>( pickedKatakana, Options.CSS.WriteKana));
         return exerciseList;
